@@ -60,14 +60,26 @@ export async function POST(req: Request) {
         try {
           const lastUserMessage = messages[messages.length - 1];
           
-          if (lastUserMessage && lastUserMessage.content) {
-            // ユーザーのメッセージを保存
-            await db.insert(aiConversations).values({
-              userId,
-              role: "user",
-              content: lastUserMessage.content,
-              createdAt: new Date(),
-            });
+          if (lastUserMessage) {
+            let userContent = "";
+            if (typeof lastUserMessage.content === "string") {
+              userContent = lastUserMessage.content;
+            } else if (Array.isArray(lastUserMessage.content)) {
+              userContent = (lastUserMessage.content as any[])
+                .filter(part => part.type === "text")
+                .map(part => part.text)
+                .join("");
+            }
+
+            if (userContent) {
+              // ユーザーのメッセージを保存
+              await db.insert(aiConversations).values({
+                userId,
+                role: "user",
+                content: userContent,
+                createdAt: new Date(),
+              });
+            }
           }
           
           // AIのメッセージを保存
@@ -83,7 +95,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return result.toUIMessageStreamResponse();
+    return result.toTextStreamResponse();
   } catch (err: any) {
     console.error("Chat API error:", err);
     return new Response(err.message || "Internal Server Error", { status: 500 });

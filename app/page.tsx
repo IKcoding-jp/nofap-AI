@@ -42,15 +42,15 @@ export default async function DashboardPage() {
   const moteLevel = Math.min(userStreak.currentStreak * 5, 100);
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8">
+    <main className="min-h-screen bg-background p-4 md:p-8">
       <div className="mx-auto max-w-2xl space-y-6">
         {/* ヘッダー */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">
+            <h1 className="text-2xl font-bold text-foreground">
               おかえりなさい、{session.user.name}さん
             </h1>
-            <p className="text-slate-500 text-sm">今日の調子はいかがですか？</p>
+            <p className="text-muted-foreground text-sm">今日の調子はいかがですか？</p>
           </div>
           <UserNav />
         </div>
@@ -68,34 +68,38 @@ export default async function DashboardPage() {
         </div>
 
         {/* クイックリンク */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
           <Link href="/calendar" className="w-full">
-            <Button variant="outline" className="w-full h-16 flex-col gap-1 border-slate-200 bg-white hover:bg-slate-50">
-              <span className="text-xs text-slate-500 font-normal">過去の記録</span>
+            <Button variant="outline" className="w-full h-16 flex-col gap-1 border-border bg-card hover:bg-accent transition-colors">
+              <span className="text-xs text-muted-foreground font-normal">過去の記録</span>
               <span>カレンダー</span>
             </Button>
           </Link>
           <Link href="/journal" className="w-full">
-            <Button variant="outline" className="w-full h-16 flex-col gap-1 border-slate-200 bg-white hover:bg-slate-50">
-              <span className="text-xs text-slate-500 font-normal">振り返り</span>
+            <Button variant="outline" className="w-full h-16 flex-col gap-1 border-border bg-card hover:bg-accent transition-colors">
+              <span className="text-xs text-muted-foreground font-normal">振り返り</span>
               <span>日記一覧</span>
             </Button>
           </Link>
         </div>
         
-        <Link href="/chat" className="block w-full">
-          <Button className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white gap-2">
-            AIに相談する
-          </Button>
-        </Link>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400 fill-mode-both">
+          <Link href="/chat" className="block w-full">
+            <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground gap-2 shadow-md">
+              AIに相談する
+            </Button>
+          </Link>
+        </div>
 
         {/* 緊急 SOS ボタン */}
-        <Link href="/chat?sos=true" className="block w-full">
-          <Button variant="outline" className="w-full h-12 border-red-500 text-red-600 hover:bg-red-50 gap-2 font-bold animate-pulse">
-            <AlertTriangle className="h-5 w-5" />
-            ⚠️ 今すぐ助けが必要（負けそう）
-          </Button>
-        </Link>
+        <div className="animate-in fade-in zoom-in-95 duration-500 delay-500 fill-mode-both">
+          <Link href="/chat?sos=true" className="block w-full">
+            <Button variant="outline" className="w-full h-12 border-red-500/50 text-red-600 hover:bg-red-500/10 gap-2 font-bold animate-pulse shadow-sm">
+              <AlertTriangle className="h-5 w-5" />
+              ⚠️ 今すぐ助けが必要（負けそう）
+            </Button>
+          </Link>
+        </div>
       </div>
     </main>
   );

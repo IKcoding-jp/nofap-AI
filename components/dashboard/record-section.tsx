@@ -4,6 +4,7 @@ import { recordDay } from "@/app/actions/records";
 import { StatusActions } from "./status-actions";
 import { useState, useTransition } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { motion } from "framer-motion";
 
 export function RecordSection() {
   const [isPending, startTransition] = useTransition();
@@ -21,14 +22,19 @@ export function RecordSection() {
   };
 
   return (
-    <div className="space-y-4">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="space-y-4"
+    >
       <div className="space-y-2">
-        <h2 className="text-lg font-semibold text-slate-800 px-1">今日の記録</h2>
+        <h2 className="text-lg font-semibold text-foreground px-1">今日の記録</h2>
         <Textarea
           placeholder="今日の一言（日記・反省）"
           value={journal}
           onChange={(e) => setJournal(e.target.value)}
-          className="min-h-[100px] bg-white"
+          className="min-h-[100px] bg-card border-border transition-colors focus:border-primary"
         />
       </div>
       <StatusActions
@@ -36,7 +42,7 @@ export function RecordSection() {
         onFailure={() => handleRecord("failure")}
         disabled={isPending}
       />
-    </div>
+    </motion.div>
   );
 }
 

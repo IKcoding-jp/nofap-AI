@@ -24,18 +24,20 @@ export default async function CalendarPage() {
   });
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8">
+    <main className="min-h-screen bg-background p-4 md:p-8">
       <div className="mx-auto max-w-4xl space-y-6">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
           <Link href="/">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="hover:bg-accent">
               <ChevronLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">活動カレンダー</h1>
+          <h1 className="text-2xl font-bold text-foreground">活動カレンダー</h1>
         </div>
 
-        <ActivityCalendar records={records} />
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-both">
+          <ActivityCalendar records={records} />
+        </div>
       </div>
     </main>
   );
