@@ -1,65 +1,102 @@
-import Image from "next/image";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { streaks } from "@/schema";
+import { eq } from "drizzle-orm";
+import { StreakCounter } from "@/components/dashboard/streak-counter";
+import { MoteMeter } from "@/components/dashboard/mote-meter";
+import { RecordSection } from "@/components/dashboard/record-section";
+import { UserNav } from "@/components/layout/user-nav";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle } from "lucide-react";
+import Link from "next/link";
 
-export default function Home() {
+export default async function DashboardPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  // データの取得 (エラーハンドリング付き)
+  let userStreak = { currentStreak: 0, maxStreak: 0 };
+  try {
+    const data = await db.query.streaks.findFirst({
+      where: eq(streaks.userId, session.user.id),
+    });
+    if (data) {
+      userStreak = {
+        currentStreak: data.currentStreak,
+        maxStreak: data.maxStreak
+      };
+    }
+  } catch (e) {
+    console.error("Database connection failed:", e);
+    // エラー時は初期値を使用
+  }
+
+  // モテ度の計算 (単純に日数 * 5, 最大100)
+  const moteLevel = Math.min(userStreak.currentStreak * 5, 100);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-slate-50 p-4 md:p-8">
+      <div className="mx-auto max-w-2xl space-y-6">
+        {/* ヘッダー */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">
+              おかえりなさい、{session.user.name}さん
+            </h1>
+            <p className="text-slate-500 text-sm">今日の調子はいかがですか？</p>
+          </div>
+          <UserNav />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* メイングリッド */}
+        <div className="grid gap-6">
+          <StreakCounter
+            currentStreak={userStreak.currentStreak}
+            maxStreak={userStreak.maxStreak}
+          />
+          
+          <MoteMeter level={moteLevel} />
+
+          <RecordSection />
         </div>
-      </main>
-    </div>
+
+        {/* クイックリンク */}
+        <div className="grid grid-cols-2 gap-4">
+          <Link href="/calendar" className="w-full">
+            <Button variant="outline" className="w-full h-16 flex-col gap-1 border-slate-200 bg-white hover:bg-slate-50">
+              <span className="text-xs text-slate-500 font-normal">過去の記録</span>
+              <span>カレンダー</span>
+            </Button>
+          </Link>
+          <Link href="/journal" className="w-full">
+            <Button variant="outline" className="w-full h-16 flex-col gap-1 border-slate-200 bg-white hover:bg-slate-50">
+              <span className="text-xs text-slate-500 font-normal">振り返り</span>
+              <span>日記一覧</span>
+            </Button>
+          </Link>
+        </div>
+        
+        <Link href="/chat" className="block w-full">
+          <Button className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white gap-2">
+            AIに相談する
+          </Button>
+        </Link>
+
+        {/* 緊急 SOS ボタン */}
+        <Link href="/chat?sos=true" className="block w-full">
+          <Button variant="outline" className="w-full h-12 border-red-500 text-red-600 hover:bg-red-50 gap-2 font-bold animate-pulse">
+            <AlertTriangle className="h-5 w-5" />
+            ⚠️ 今すぐ助けが必要（負けそう）
+          </Button>
+        </Link>
+      </div>
+    </main>
   );
 }
