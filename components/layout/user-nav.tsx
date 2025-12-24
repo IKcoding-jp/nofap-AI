@@ -2,9 +2,10 @@
 
 import { signOut } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import Link from "next/link";
 
 export function UserNav() {
   const router = useRouter();
@@ -22,6 +23,15 @@ export function UserNav() {
   return (
     <div className="flex items-center gap-2">
       <ThemeToggle />
+      <Link href="/settings">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-slate-500 hover:text-primary transition-colors"
+        >
+          <Settings className="h-5 w-5" />
+        </Button>
+      </Link>
       <Button
         variant="ghost"
         size="icon"

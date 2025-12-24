@@ -71,6 +71,8 @@ export const dailyRecords = sqliteTable("daily_records", {
   date: text("date").notNull(), // ISO Date string YYYY-MM-DD
   status: text("status", { enum: ["success", "failure"] }).notNull(),
   journal: text("journal"),
+  analysisSummary: text("analysis_summary"),
+  analysisCategory: text("analysis_category"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
@@ -85,3 +87,29 @@ export const aiConversations = sqliteTable("ai_conversations", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
+export const userProfiles = sqliteTable("user_profiles", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  goal: text("goal"),
+  reason: text("reason"),
+  failTriggers: text("fail_triggers"),
+  selectedPersona: text("selected_persona", { enum: ["mina", "sayuri", "alice"] }).notNull().default("sayuri"),
+  totalXp: integer("total_xp").notNull().default(0),
+  level: integer("level").notNull().default(1),
+  moteLevel: integer("mote_level").notNull().default(0),
+  updatedAt: integer("updated_at", { mode: "timestamp" }),
+});
+
+export const userHabits = sqliteTable("user_habits", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  habitName: text("habit_name").notNull(),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  streak: integer("streak").notNull().default(0),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+});

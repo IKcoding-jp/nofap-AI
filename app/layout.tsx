@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { PWARegistration } from "@/components/pwa-registration";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,6 +18,20 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "NoFap AI Support",
   description: "オナ禁をサポートするAI Webサービス",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "NoFap AI",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -35,6 +50,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <PWARegistration />
           {children}
           <Toaster />
         </ThemeProvider>

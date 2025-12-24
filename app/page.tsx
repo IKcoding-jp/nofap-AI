@@ -2,15 +2,17 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { streaks } from "@/schema";
+import { streaks, userProfiles } from "@/schema";
 import { eq } from "drizzle-orm";
 import { StreakCounter } from "@/components/dashboard/streak-counter";
 import { MoteMeter } from "@/components/dashboard/mote-meter";
 import { RecordSection } from "@/components/dashboard/record-section";
+import { LevelCard } from "@/components/dashboard/level-card";
 import { UserNav } from "@/components/layout/user-nav";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Hammer } from "lucide-react";
 import Link from "next/link";
+import { calculateLevel, calculateMoteLevel, getTitles } from "@/lib/gamification";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
@@ -21,25 +23,49 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  // データの取得 (エラーハンドリング付き)
+  const userId = session.user.id;
+
+  // データの取得
   let userStreak = { currentStreak: 0, maxStreak: 0 };
+  let userProfile = { level: 1, totalXp: 0, moteLevel: 0 };
+
   try {
-    const data = await db.query.streaks.findFirst({
-      where: eq(streaks.userId, session.user.id),
+    const streakData = await db.query.streaks.findFirst({
+      where: eq(streaks.userId, userId),
     });
-    if (data) {
+    if (streakData) {
       userStreak = {
-        currentStreak: data.currentStreak,
-        maxStreak: data.maxStreak
+        currentStreak: streakData.currentStreak,
+        maxStreak: streakData.maxStreak
       };
     }
+
+    const profileData = await db.query.userProfiles.findFirst({
+      where: eq(userProfiles.userId, userId),
+    });
+    if (profileData) {
+      userProfile = {
+        level: profileData.level,
+        totalXp: profileData.totalXp,
+        moteLevel: profileData.moteLevel,
+      };
+    } else {
+      // プロファイルがない場合は作成（初期化）
+      await db.insert(userProfiles).values({
+        userId,
+        totalXp: 0,
+        level: 1,
+        moteLevel: calculateMoteLevel(userStreak.currentStreak),
+        updatedAt: new Date(),
+      });
+    }
   } catch (e) {
-    console.error("Database connection failed:", e);
-    // エラー時は初期値を使用
+    console.error("Database error:", e);
   }
 
-  // モテ度の計算 (単純に日数 * 5, 最大100)
-  const moteLevel = Math.min(userStreak.currentStreak * 5, 100);
+  const { level, nextLevelXp, progress } = calculateLevel(userProfile.totalXp);
+  const titles = getTitles(level);
+  const moteLevel = calculateMoteLevel(userStreak.currentStreak);
 
   return (
     <main className="min-h-screen bg-background p-4 md:p-8">
@@ -57,10 +83,19 @@ export default async function DashboardPage() {
 
         {/* メイングリッド */}
         <div className="grid gap-6">
-          <StreakCounter
-            currentStreak={userStreak.currentStreak}
-            maxStreak={userStreak.maxStreak}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <StreakCounter
+              currentStreak={userStreak.currentStreak}
+              maxStreak={userStreak.maxStreak}
+            />
+            <LevelCard 
+              level={level}
+              xp={userProfile.totalXp}
+              nextLevelXp={nextLevelXp}
+              progress={progress}
+              titles={titles}
+            />
+          </div>
           
           <MoteMeter level={moteLevel} />
 
@@ -82,8 +117,17 @@ export default async function DashboardPage() {
             </Button>
           </Link>
         </div>
-        
+
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400 fill-mode-both">
+          <Link href="/tools" className="block w-full">
+            <Button variant="secondary" className="w-full h-12 gap-2 shadow-sm border border-border">
+              <Hammer className="h-4 w-4" />
+              サポートツール (瞑想・筋トレ)
+            </Button>
+          </Link>
+        </div>
+        
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">
           <Link href="/chat" className="block w-full">
             <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground gap-2 shadow-md">
               AIに相談する
