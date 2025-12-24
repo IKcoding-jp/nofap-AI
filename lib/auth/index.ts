@@ -13,6 +13,8 @@ export const auth = betterAuth({
       verification: schema.verification,
     },
   }),
+  // デプロイ先では BETTER_AUTH_URL 環境変数を https://nofap-ai.vercel.app に設定してください
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
   emailAndPassword: {
     enabled: true,
   },
