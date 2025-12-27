@@ -6,8 +6,9 @@ import { redirect } from "next/navigation";
 export default async function ChatPage({
   searchParams,
 }: {
-  searchParams: { session?: string };
+  searchParams: Promise<{ session?: string }>;
 }) {
+  const resolvedParams = await searchParams;
   // 既存データの移行（エラーが発生しても続行）
   try {
     await migrateExistingConversations();
@@ -18,9 +19,9 @@ export default async function ChatPage({
   let sessionId: number | undefined;
   let initialMessages: any[] = [];
 
-  if (searchParams.session) {
+  if (resolvedParams.session) {
     // URLクエリからsessionIdを取得
-    sessionId = parseInt(searchParams.session);
+    sessionId = parseInt(resolvedParams.session);
     if (!isNaN(sessionId)) {
       try {
         initialMessages = await getChatHistory(sessionId);

@@ -8,6 +8,13 @@
       "when": 1766667386426,
       "tag": "0000_green_black_bolt",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1766804218377,
+      "tag": "0001_exotic_albert_cleary",
+      "breakpoints": true
     }
   ]
 }

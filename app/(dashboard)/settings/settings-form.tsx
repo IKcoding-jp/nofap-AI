@@ -67,7 +67,7 @@ export default function SettingsForm({ initialProfile }: { initialProfile: any }
   const personas = [
     {
       id: "sayuri",
-      name: "サユリ",
+      name: "ユミ",
       role: "包容力のあるお姉さん",
       description: "優しく寄り添い、あなたの努力を全肯定します。",
     },

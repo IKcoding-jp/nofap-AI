@@ -112,6 +112,12 @@ export const userProfiles = sqliteTable("user_profiles", {
   totalXp: integer("total_xp").notNull().default(0),
   level: integer("level").notNull().default(1),
   moteLevel: integer("mote_level").notNull().default(0),
+  moteVitality: integer("mote_vitality").notNull().default(0),
+  moteCalmness: integer("mote_calmness").notNull().default(0),
+  moteConfidence: integer("mote_confidence").notNull().default(0),
+  moteCleanliness: integer("mote_cleanliness").notNull().default(0),
+  maxMoteLevel: integer("max_mote_level").notNull().default(0),
+  lastResetAt: integer("last_reset_at", { mode: "timestamp" }),
   updatedAt: integer("updated_at", { mode: "timestamp" }),
 });
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, isAfter, isBefore, startOfDay } from "date-fns";
 import { ja } from "date-fns/locale";
 
 interface ActivityCalendarProps {
@@ -13,17 +13,58 @@ interface ActivityCalendarProps {
     status: "success" | "failure";
     journal?: string | null;
   }>;
+  startedAt: Date | null;
 }
 
-export function ActivityCalendar({ records }: ActivityCalendarProps) {
+export function ActivityCalendar({ records, startedAt }: ActivityCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
-  // 日付文字列をキーにしたマップを作成
-  const recordMap = new Map(records.map(r => [r.date, r]));
+  // 日付文字列をキーにしたマップを作成（failure のみ）
+  const failureRecordMap = useMemo(() => {
+    const map = new Map<string, { date: string; status: "failure"; journal?: string | null }>();
+    records.forEach(r => {
+      if (r.status === "failure") {
+        map.set(r.date, r);
+      }
+    });
+    return map;
+  }, [records]);
 
+  // 日記があるレコードのマップ（表示用）
+  const journalRecordMap = useMemo(() => {
+    const map = new Map(records.map(r => [r.date, r]));
+    return map;
+  }, [records]);
+
+  // 開始日から今日までの期間を計算
+  const today = startOfDay(new Date());
+  const startDate = startedAt ? startOfDay(new Date(startedAt)) : null;
+
+  // 日付が成功期間内かどうかを判定
+  const isSuccessDate = (date: Date): boolean => {
+    if (!startDate) return false;
+    const dateStart = startOfDay(date);
+    // 開始日から今日までの期間内で、かつ failure 記録がない
+    return (
+      !isBefore(dateStart, startDate) &&
+      !isAfter(dateStart, today) &&
+      !failureRecordMap.has(format(dateStart, "yyyy-MM-dd"))
+    );
+  };
+
+  // 選択された日付のレコードを取得（日記表示用）
   const selectedRecord = selectedDate 
-    ? recordMap.get(format(selectedDate, "yyyy-MM-dd"))
+    ? journalRecordMap.get(format(selectedDate, "yyyy-MM-dd"))
     : undefined;
+
+  // 選択された日付のステータスを判定
+  const selectedDateStatus = selectedDate
+    ? (failureRecordMap.has(format(selectedDate, "yyyy-MM-dd"))
+        ? "failure"
+        : isSuccessDate(selectedDate)
+        ? "success"
+        : null)
+    : null;
 
   return (
     <div className="grid gap-6 md:grid-cols-[1fr_300px]">
@@ -36,8 +77,8 @@ export function ActivityCalendar({ records }: ActivityCalendarProps) {
             className="rounded-md border shadow-sm"
             locale={ja}
             modifiers={{
-              success: (date) => recordMap.get(format(date, "yyyy-MM-dd"))?.status === "success",
-              failure: (date) => recordMap.get(format(date, "yyyy-MM-dd"))?.status === "failure",
+              success: (date) => isSuccessDate(date),
+              failure: (date) => failureRecordMap.has(format(date, "yyyy-MM-dd")),
             }}
             modifiersClassNames={{
               success: "bg-blue-500/20 text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-500/30",
@@ -54,19 +95,19 @@ export function ActivityCalendar({ records }: ActivityCalendarProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="flex-1 space-y-4">
-          {selectedRecord ? (
+          {selectedDateStatus ? (
             <>
               <div className="flex items-center gap-2">
                 <span className={cn(
                   "inline-block w-3 h-3 rounded-full",
-                  selectedRecord.status === "success" ? "bg-blue-500" : "bg-red-500"
+                  selectedDateStatus === "success" ? "bg-blue-500" : "bg-red-500"
                 )} />
                 <span className="font-medium text-foreground">
-                  {selectedRecord.status === "success" ? "オナ禁成功！" : "失敗..."}
+                  {selectedDateStatus === "success" ? "オナ禁成功！" : "失敗..."}
                 </span>
               </div>
               <div className="text-sm text-foreground bg-muted p-3 rounded-md min-h-[100px] border border-border">
-                {selectedRecord.journal || "日記の記録はありません。"}
+                {selectedRecord?.journal || "日記の記録はありません。"}
               </div>
             </>
           ) : (

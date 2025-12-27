@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { dailyRecords } from "@/schema";
+import { dailyRecords, streaks } from "@/schema";
 import { eq, desc } from "drizzle-orm";
 import { ActivityCalendar } from "@/components/calendar/activity-calendar";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,12 @@ export default async function CalendarPage() {
     orderBy: [desc(dailyRecords.date)],
   });
 
+  const userStreak = await db.query.streaks.findFirst({
+    where: eq(streaks.userId, session.user.id),
+  });
+
+  const startedAt = userStreak?.startedAt || null;
+
   return (
     <main className="min-h-screen bg-background p-4 md:p-8">
       <div className="mx-auto max-w-4xl space-y-6">
@@ -36,7 +42,7 @@ export default async function CalendarPage() {
         </div>
 
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-both">
-          <ActivityCalendar records={records} />
+          <ActivityCalendar records={records} startedAt={startedAt} />
         </div>
       </div>
     </main>

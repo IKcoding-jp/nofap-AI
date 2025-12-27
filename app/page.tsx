@@ -5,14 +5,16 @@ import { db } from "@/lib/db";
 import { streaks, userProfiles } from "@/schema";
 import { eq } from "drizzle-orm";
 import { StreakCounter } from "@/components/dashboard/streak-counter";
+import { StartStreakButton } from "@/components/dashboard/start-streak-button";
 import { MoteMeter } from "@/components/dashboard/mote-meter";
+import { MoteMission } from "@/components/dashboard/mote-mission";
 import { RecordSection } from "@/components/dashboard/record-section";
 import { LevelCard } from "@/components/dashboard/level-card";
 import { UserNav } from "@/components/layout/user-nav";
 import { Button } from "@/components/ui/button";
 import { Hammer } from "lucide-react";
 import Link from "next/link";
-import { calculateLevel, calculateMoteLevel, getTitles } from "@/lib/gamification";
+import { calculateLevel, calculateConfidence, calculateMoteLevel, getTitles } from "@/lib/gamification";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
@@ -26,7 +28,7 @@ export default async function DashboardPage() {
   const userId = session.user.id;
 
   // データの取得
-  let userStreak = { currentStreak: 0, maxStreak: 0 };
+  let userStreak = { currentStreak: 0, maxStreak: 0, startedAt: null as Date | null };
   let userProfile = { level: 1, totalXp: 0, moteLevel: 0 };
 
   try {
@@ -36,7 +38,8 @@ export default async function DashboardPage() {
     if (streakData) {
       userStreak = {
         currentStreak: streakData.currentStreak,
-        maxStreak: streakData.maxStreak
+        maxStreak: streakData.maxStreak,
+        startedAt: streakData.startedAt || null,
       };
     }
 
@@ -48,16 +51,43 @@ export default async function DashboardPage() {
         level: profileData.level,
         totalXp: profileData.totalXp,
         moteLevel: profileData.moteLevel,
+        moteAttributes: {
+          confidence: profileData.moteConfidence,
+          vitality: profileData.moteVitality,
+          calmness: profileData.moteCalmness,
+          cleanliness: profileData.moteCleanliness,
+        }
       };
     } else {
       // プロファイルがない場合は作成（初期化）
+      const initialConfidence = calculateConfidence(userStreak.currentStreak);
+      const initialMoteLevel = calculateMoteLevel({
+        confidence: initialConfidence,
+        vitality: 0,
+        calmness: 0,
+        cleanliness: 0,
+      });
+
       await db.insert(userProfiles).values({
         userId,
         totalXp: 0,
         level: 1,
-        moteLevel: calculateMoteLevel(userStreak.currentStreak),
+        moteConfidence: initialConfidence,
+        moteLevel: initialMoteLevel,
         updatedAt: new Date(),
       });
+      
+      userProfile = {
+        level: 1,
+        totalXp: 0,
+        moteLevel: initialMoteLevel,
+        moteAttributes: {
+          confidence: initialConfidence,
+          vitality: 0,
+          calmness: 0,
+          cleanliness: 0,
+        }
+      };
     }
   } catch (e) {
     console.error("Database error:", e);
@@ -65,7 +95,6 @@ export default async function DashboardPage() {
 
   const { level, nextLevelXp, progress } = calculateLevel(userProfile.totalXp);
   const titles = getTitles(level);
-  const moteLevel = calculateMoteLevel(userStreak.currentStreak);
 
   return (
     <main className="min-h-screen bg-background p-4 md:p-8">
@@ -82,12 +111,17 @@ export default async function DashboardPage() {
         </div>
 
         {/* メイングリッド */}
-        <div className="grid gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <StreakCounter
-              currentStreak={userStreak.currentStreak}
-              maxStreak={userStreak.maxStreak}
-            />
+        <div className="grid gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {userStreak.startedAt ? (
+              <StreakCounter
+                currentStreak={userStreak.currentStreak}
+                maxStreak={userStreak.maxStreak}
+                startedAt={userStreak.startedAt}
+              />
+            ) : (
+              <StartStreakButton />
+            )}
             <LevelCard 
               level={level}
               xp={userProfile.totalXp}
@@ -97,7 +131,12 @@ export default async function DashboardPage() {
             />
           </div>
           
-          <MoteMeter level={moteLevel} />
+          <MoteMeter 
+            level={userProfile.moteLevel} 
+            attributes={(userProfile as any).moteAttributes} 
+          />
+
+          <MoteMission />
 
           <RecordSection />
         </div>
