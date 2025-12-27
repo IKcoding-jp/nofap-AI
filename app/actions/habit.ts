@@ -40,3 +40,8 @@ export async function recordMuscleTraining(count: number) {
   revalidatePath("/tools");
 }
 
+
+
+
+
+

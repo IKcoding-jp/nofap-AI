@@ -1,10 +1,10 @@
 import { openai } from "@ai-sdk/openai";
 import { streamText, convertToModelMessages } from "ai";
 import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { db } from "@/lib/db";
-import { aiConversations, streaks, userProfiles } from "@/schema";
-import { eq } from "drizzle-orm";
+import { aiConversations, aiChatSessions, streaks, userProfiles } from "@/schema";
+import { eq, and } from "drizzle-orm";
 
 export const maxDuration = 30;
 
@@ -18,8 +18,39 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { messages } = await req.json();
+    // Get sessionId from URL path, headers, query parameters, or request body
+    const url = new URL(req.url);
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    const pathSessionId = pathParts[pathParts.length - 1] && pathParts[pathParts.length - 1] !== 'chat' ? parseInt(pathParts[pathParts.length - 1], 10) : null;
+    const headerSessionId = req.headers.get('x-session-id');
+    const querySessionId = url.searchParams.get('sessionId');
+    const cookieStore = await cookies();
+    const cookieSessionId = cookieStore.get("aiChatSessionId")?.value ?? null;
+    const requestBody = await req.json();
+    const { messages, sessionId: bodySessionId } = requestBody;
+    const sessionId =
+      pathSessionId ||
+      (headerSessionId ? parseInt(headerSessionId, 10) : null) ||
+      (querySessionId ? parseInt(querySessionId, 10) : null) ||
+      (cookieSessionId ? parseInt(cookieSessionId, 10) : null) ||
+      bodySessionId;
     const userId = session.user.id;
+
+    if (!sessionId || isNaN(sessionId)) {
+      return new Response("Session ID is required", { status: 400 });
+    }
+
+    // セッションがユーザーのものか確認
+    const chatSession = await db.query.aiChatSessions.findFirst({
+      where: and(
+        eq(aiChatSessions.id, sessionId),
+        eq(aiChatSessions.userId, userId)
+      ),
+    });
+
+    if (!chatSession) {
+      return new Response("Session not found or unauthorized", { status: 403 });
+    }
 
     // ユーザーの現在の状況を取得してAIにコンテキストとして渡す
     const userStreak = await db.query.streaks.findFirst({
@@ -62,7 +93,7 @@ export async function POST(req: Request) {
     }
 
     const result = streamText({
-      model: openai("gpt-4o"),
+      model: openai("gpt-5.2"),
       temperature: 0.8,
       presencePenalty: 0.1,
       frequencyPenalty: 0.1,
@@ -96,6 +127,7 @@ export async function POST(req: Request) {
       onFinish: async ({ text }) => {
         // 会話履歴をDBに保存
         try {
+          const now = new Date();
           const lastUserMessage = messages[messages.length - 1];
           
           if (lastUserMessage) {
@@ -113,9 +145,10 @@ export async function POST(req: Request) {
               // ユーザーのメッセージを保存
               await db.insert(aiConversations).values({
                 userId,
+                sessionId,
                 role: "user",
                 content: userContent,
-                createdAt: new Date(),
+                createdAt: now,
               });
             }
           }
@@ -123,16 +156,24 @@ export async function POST(req: Request) {
           // AIのメッセージを保存
           await db.insert(aiConversations).values({
             userId,
+            sessionId,
             role: "assistant",
             content: text,
-            createdAt: new Date(),
+            createdAt: now,
           });
+
+          // セッションのlastMessageAtを更新
+          await db.update(aiChatSessions)
+            .set({
+              lastMessageAt: now,
+              updatedAt: now,
+            })
+            .where(eq(aiChatSessions.id, sessionId));
         } catch (e) {
           console.error("Failed to save conversation:", e);
         }
       },
     });
-
     return result.toUIMessageStreamResponse();
   } catch (err: any) {
     console.error("Chat API error:", err);

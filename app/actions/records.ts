@@ -13,7 +13,7 @@ import { generateText } from "ai";
 async function analyzeJournal(userId: string, journal: string) {
   try {
     const { text } = await generateText({
-      model: openai("gpt-4o"),
+      model: openai("gpt-5.2"),
       system: `あなたは「オナ禁サポートAI」の分析担当です。
       ユーザーの日記を読み、以下の2点をJSON形式で出力してください。
       1. summary: 日記の短い要約（15文字以内）

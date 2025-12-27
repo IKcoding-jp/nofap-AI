@@ -76,11 +76,24 @@ export const dailyRecords = sqliteTable("daily_records", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
+export const aiChatSessions = sqliteTable("ai_chat_sessions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  title: text("title").notNull().default("新しいチャット"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }),
+  lastMessageAt: integer("last_message_at", { mode: "timestamp" }),
+});
+
 export const aiConversations = sqliteTable("ai_conversations", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  sessionId: integer("session_id")
+    .references(() => aiChatSessions.id, { onDelete: "cascade" }),
   role: text("role", { enum: ["user", "assistant"] }).notNull(),
   content: text("content").notNull(),
   contextType: text("context_type", { enum: ["general", "emergency", "advice"] }).notNull().default("general"),

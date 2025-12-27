@@ -10,7 +10,7 @@ import { RecordSection } from "@/components/dashboard/record-section";
 import { LevelCard } from "@/components/dashboard/level-card";
 import { UserNav } from "@/components/layout/user-nav";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Hammer } from "lucide-react";
+import { Hammer } from "lucide-react";
 import Link from "next/link";
 import { calculateLevel, calculateMoteLevel, getTitles } from "@/lib/gamification";
 
@@ -131,16 +131,6 @@ export default async function DashboardPage() {
           <Link href="/chat" className="block w-full">
             <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground gap-2 shadow-md">
               AIに相談する
-            </Button>
-          </Link>
-        </div>
-
-        {/* 緊急 SOS ボタン */}
-        <div className="animate-in fade-in zoom-in-95 duration-500 delay-500 fill-mode-both">
-          <Link href="/chat?sos=true" className="block w-full">
-            <Button variant="outline" className="w-full h-12 border-red-500/50 text-red-600 hover:bg-red-500/10 gap-2 font-bold animate-pulse shadow-sm">
-              <AlertTriangle className="h-5 w-5" />
-              ⚠️ 今すぐ助けが必要（負けそう）
             </Button>
           </Link>
         </div>
