@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Play, Pause, RotateCcw, Wind } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 export function MeditationTimer() {
   const [isActive, setIsActive] = useState(false);
@@ -14,16 +14,28 @@ export function MeditationTimer() {
   // 深呼吸モードのアニメーション用
   const [breathPhase, setBreathPhase] = useState<"in" | "hold" | "out">("in");
 
+  // タイマーのカウントダウン
   useEffect(() => {
-    let interval: any = null;
-    if (isActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((time) => time - 1);
-      }, 1000);
-    } else if (timeLeft === 0) {
-      setIsActive(false);
-      // ここで完了後のXP付与などを検討（今回は省略）
+    if (!isActive || timeLeft <= 0) {
+      if (timeLeft === 0 && isActive) {
+        // タイマーが0になったら停止（次のレンダリングサイクルで処理）
+        setTimeout(() => setIsActive(false), 0);
+        // ここで完了後のXP付与などを検討（今回は省略）
+      }
+      return;
     }
+
+    const interval = setInterval(() => {
+      setTimeLeft((time) => {
+        if (time <= 1) {
+          setIsActive(false);
+          // ここで完了後のXP付与などを検討（今回は省略）
+          return 0;
+        }
+        return time - 1;
+      });
+    }, 1000);
+
     return () => clearInterval(interval);
   }, [isActive, timeLeft]);
 

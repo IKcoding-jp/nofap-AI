@@ -87,13 +87,6 @@ export function MoteMeter({ level, attributes }: MoteMeterProps) {
     return `${x},${y}`;
   };
 
-  const attrPoints = attributes ? [
-    getPoint(attributes.confidence, 0),
-    getPoint(attributes.vitality, 90),
-    getPoint(attributes.calmness, 180),
-    getPoint(attributes.cleanliness, 270),
-  ].join(" ") : "";
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -130,7 +123,9 @@ export function MoteMeter({ level, attributes }: MoteMeterProps) {
               <div className="flex items-center gap-4 bg-accent/30 p-3 rounded-lg border border-border/50">
                 <div className="bg-background p-2 rounded shadow-sm border border-border shrink-0">
                   {/* アイコンサイズを調整 */}
-                  {React.cloneElement(stage.icon as React.ReactElement, { className: "h-5 w-5" })}
+                  <div className="h-5 w-5">
+                    {stage.icon}
+                  </div>
                 </div>
                 <div className="min-w-0">
                   <h4 className="font-bold text-foreground leading-tight text-sm truncate">{stage.name}</h4>

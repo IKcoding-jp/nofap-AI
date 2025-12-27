@@ -126,10 +126,10 @@ export async function saveJournal(journal: string) {
 
     let newConfidence = ensureNumber(userProfile.moteConfidence);
     let newCalmness = ensureNumber(userProfile.moteCalmness);
-    let newVitality = ensureNumber(userProfile.moteVitality);
-    let newCleanliness = ensureNumber(userProfile.moteCleanliness);
-    let newTotalXp = ensureNumber(userProfile.totalXp) + xpToAdd;
-    let { level: newLevel } = calculateLevel(newTotalXp);
+    const newVitality = ensureNumber(userProfile.moteVitality);
+    const newCleanliness = ensureNumber(userProfile.moteCleanliness);
+    const newTotalXp = ensureNumber(userProfile.totalXp) + xpToAdd;
+    const { level: newLevel } = calculateLevel(newTotalXp);
 
     // 最新のストリーク情報を取得して自信(Confidence)を計算
     if (userStreak) {
@@ -363,8 +363,8 @@ export async function recordDay(status: "success" | "failure", journal?: string)
     let newCalmness = ensureNumber(userProfile.moteCalmness);
     let newVitality = ensureNumber(userProfile.moteVitality);
     let newCleanliness = ensureNumber(userProfile.moteCleanliness);
-    let newTotalXp = ensureNumber(userProfile.totalXp) + xpToAdd;
-    let { level: newLevel } = calculateLevel(newTotalXp);
+    const newTotalXp = ensureNumber(userProfile.totalXp) + xpToAdd;
+    const { level: newLevel } = calculateLevel(newTotalXp);
 
     if (status === "success") {
       // 最新のストリーク情報を取得して自信(Confidence)を計算

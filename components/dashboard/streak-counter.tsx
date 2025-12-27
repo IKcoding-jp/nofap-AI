@@ -24,15 +24,26 @@ interface StreakCounterProps {
 }
 
 export function StreakCounter({ currentStreak, maxStreak, startedAt }: StreakCounterProps) {
-  const [elapsed, setElapsed] = useState<ElapsedTime | null>(null);
+  const [elapsed, setElapsed] = useState<ElapsedTime | null>(() => {
+    if (!startedAt) return null;
+    return calculateElapsedTime(startedAt);
+  });
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
+  // startedAtが変更された場合の処理（次のレンダリングサイクルで処理）
+  useEffect(() => {
+    if (!startedAt) {
+      setTimeout(() => setElapsed(null), 0);
+    } else {
+      setTimeout(() => setElapsed(calculateElapsedTime(startedAt)), 0);
+    }
+  }, [startedAt]);
+
   // 経過時間を1秒間隔で更新
   useEffect(() => {
     if (!startedAt) {
-      setElapsed(null);
       return;
     }
 
@@ -143,7 +154,6 @@ export function StreakCounter({ currentStreak, maxStreak, startedAt }: StreakCou
             <Button
               onClick={() => setShowResetDialog(true)}
               variant="destructive"
-              size="xs"
               className="h-7 px-3 bg-red-600/80 hover:bg-red-600 text-white text-[10px]"
               disabled={isPending}
             >

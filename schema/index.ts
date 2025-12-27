@@ -74,6 +74,7 @@ export const dailyRecords = sqliteTable("daily_records", {
   analysisSummary: text("analysis_summary"),
   analysisCategory: text("analysis_category"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }),
 });
 
 export const aiChatSessions = sqliteTable("ai_chat_sessions", {

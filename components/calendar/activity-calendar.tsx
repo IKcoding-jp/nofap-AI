@@ -24,7 +24,11 @@ export function ActivityCalendar({ records, startedAt }: ActivityCalendarProps) 
     const map = new Map<string, { date: string; status: "failure"; journal?: string | null }>();
     records.forEach(r => {
       if (r.status === "failure") {
-        map.set(r.date, r);
+        map.set(r.date, {
+          date: r.date,
+          status: r.status,
+          journal: r.journal,
+        });
       }
     });
     return map;

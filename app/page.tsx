@@ -29,7 +29,27 @@ export default async function DashboardPage() {
 
   // データの取得
   let userStreak = { currentStreak: 0, maxStreak: 0, startedAt: null as Date | null };
-  let userProfile = { level: 1, totalXp: 0, moteLevel: 0 };
+  let userProfile: { 
+    level: number; 
+    totalXp: number; 
+    moteLevel: number; 
+    moteAttributes: {
+      confidence: number;
+      vitality: number;
+      calmness: number;
+      cleanliness: number;
+    };
+  } = { 
+    level: 1, 
+    totalXp: 0, 
+    moteLevel: 0,
+    moteAttributes: {
+      confidence: 0,
+      vitality: 0,
+      calmness: 0,
+      cleanliness: 0,
+    }
+  };
 
   try {
     const streakData = await db.query.streaks.findFirst({
@@ -133,7 +153,7 @@ export default async function DashboardPage() {
           
           <MoteMeter 
             level={userProfile.moteLevel} 
-            attributes={(userProfile as any).moteAttributes} 
+            attributes={userProfile.moteAttributes} 
           />
 
           <MoteMission />
