@@ -18,37 +18,37 @@ export default async function ToolsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background p-4 md:p-8">
-      <div className="mx-auto max-w-2xl space-y-6">
-        <div className="flex items-center gap-4">
+    <main className="min-h-screen bg-background p-4 sm:p-6 md:p-8">
+      <div className="mx-auto max-w-2xl space-y-4 sm:space-y-6">
+        <div className="flex items-center gap-3 sm:gap-4">
           <Link href="/">
-            <Button variant="ghost" size="icon">
-              <ChevronLeft className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="shrink-0">
+              <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">サポートツール</h1>
-            <p className="text-muted-foreground text-sm">誘惑を乗り越えるための武器です。</p>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">サポートツール</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-1">誘惑を乗り越えるための武器です。</p>
           </div>
         </div>
 
         <Tabs defaultValue="meditation" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="meditation" className="gap-2">
-              <Brain className="h-4 w-4" />
-              瞑想・深呼吸
+          <TabsList className="grid w-full grid-cols-2 h-10 sm:h-11">
+            <TabsTrigger value="meditation" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Brain className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span className="truncate">瞑想・深呼吸</span>
             </TabsTrigger>
-            <TabsTrigger value="muscle" className="gap-2">
-              <Dumbbell className="h-4 w-4" />
-              筋トレ記録
+            <TabsTrigger value="muscle" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Dumbbell className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+              <span className="truncate">筋トレ記録</span>
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="meditation" className="mt-6">
+          <TabsContent value="meditation" className="mt-4 sm:mt-6">
             <MeditationTimer />
           </TabsContent>
           
-          <TabsContent value="muscle" className="mt-6">
+          <TabsContent value="muscle" className="mt-4 sm:mt-6">
             <MuscleTrainingCounter />
           </TabsContent>
         </Tabs>

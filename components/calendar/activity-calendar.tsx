@@ -71,14 +71,14 @@ export function ActivityCalendar({ records, startedAt }: ActivityCalendarProps) 
     : null;
 
   return (
-    <div className="grid gap-6 md:grid-cols-[1fr_300px]">
-      <Card>
-        <CardContent className="p-4">
+    <div className="grid gap-4 sm:gap-6 md:grid-cols-[auto_1fr]">
+      <Card className="overflow-hidden w-full md:w-fit mx-auto md:mx-0">
+        <CardContent className="p-2 sm:p-3 md:p-4">
           <Calendar
             mode="single"
             selected={selectedDate}
             onSelect={setSelectedDate}
-            className="rounded-md border shadow-sm"
+            className="rounded-md border shadow-sm w-full"
             locale={ja}
             modifiers={{
               success: (date) => isSuccessDate(date),
@@ -92,30 +92,37 @@ export function ActivityCalendar({ records, startedAt }: ActivityCalendarProps) 
         </CardContent>
       </Card>
 
-      <Card className="flex flex-col bg-card border-border">
-        <CardHeader>
-          <CardTitle className="text-lg text-foreground">
+      <Card className="flex flex-col bg-card border-border overflow-hidden h-fit">
+        <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4 md:p-6">
+          <CardTitle className="text-sm sm:text-base md:text-lg text-foreground">
             {selectedDate ? format(selectedDate, "M月d日", { locale: ja }) : "日付を選択"}
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex-1 space-y-4">
+        <CardContent className="flex-1 space-y-2 sm:space-y-3 p-3 sm:p-4 md:p-6 pt-0">
           {selectedDateStatus ? (
             <>
               <div className="flex items-center gap-2">
                 <span className={cn(
-                  "inline-block w-3 h-3 rounded-full",
+                  "inline-block w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shrink-0",
                   selectedDateStatus === "success" ? "bg-blue-500" : "bg-red-500"
                 )} />
-                <span className="font-medium text-foreground">
+                <span className="font-medium text-foreground text-sm sm:text-base">
                   {selectedDateStatus === "success" ? "オナ禁成功！" : "失敗..."}
                 </span>
               </div>
-              <div className="text-sm text-foreground bg-muted p-3 rounded-md min-h-[100px] border border-border">
-                {selectedRecord?.journal || "日記の記録はありません。"}
-              </div>
+              {selectedRecord?.journal && (
+                <div className="text-xs sm:text-sm text-foreground bg-muted/50 p-2 sm:p-3 rounded-md border border-border">
+                  <p className="whitespace-pre-wrap leading-relaxed break-words">{selectedRecord.journal}</p>
+                </div>
+              )}
+              {!selectedRecord?.journal && (
+                <div className="text-xs sm:text-sm text-muted-foreground italic">
+                  日記の記録はありません。
+                </div>
+              )}
             </>
           ) : (
-            <div className="text-sm text-muted-foreground italic">
+            <div className="text-xs sm:text-sm text-muted-foreground italic">
               記録がありません。
             </div>
           )}

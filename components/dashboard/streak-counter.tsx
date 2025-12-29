@@ -106,14 +106,14 @@ export function StreakCounter({ currentStreak, maxStreak, startedAt }: StreakCou
       transition={{ duration: 0.5 }}
     >
       <Card className="relative overflow-hidden border-none bg-gradient-to-br from-orange-500 to-red-600 text-white shadow-lg">
-        <CardHeader className="p-4 pb-0">
-          <CardTitle className="flex items-center gap-2 text-sm font-medium opacity-90">
-            <Flame className="h-4 w-4 fill-current" />
+        <CardHeader className="p-3 sm:p-4 pb-0">
+          <CardTitle className="flex items-center gap-2 text-xs sm:text-sm font-medium opacity-90">
+            <Flame className="h-3 w-3 sm:h-4 sm:w-4 fill-current" />
             現在のストリーク
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center p-4 pt-2 space-y-2">
-          <div className="flex items-baseline gap-2">
+        <CardContent className="flex flex-col items-center justify-center p-4 sm:p-6 pt-2 space-y-3 sm:space-y-4">
+          <div className="flex items-baseline gap-1 sm:gap-2">
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
@@ -123,26 +123,30 @@ export function StreakCounter({ currentStreak, maxStreak, startedAt }: StreakCou
                 damping: 20,
                 delay: 0.2,
               }}
-              className="text-5xl font-bold tracking-tighter"
+              className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter"
             >
               {streakDays}
             </motion.div>
-            <span className="text-xl font-normal opacity-80">日目</span>
+            <span className="text-lg sm:text-xl md:text-2xl font-bold opacity-90">日目</span>
           </div>
 
           {/* 経過時間の表示 */}
           {elapsed && (
-            <div className="text-lg font-semibold tracking-tight tabular-nums">
+            <div className="text-lg sm:text-xl md:text-2xl font-black tracking-tight tabular-nums bg-white/10 px-3 sm:px-4 py-1 rounded-full backdrop-blur-sm border border-white/10">
               {elapsedStr}
             </div>
           )}
 
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] opacity-80">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 gap-y-2 text-[10px] sm:text-xs font-bold opacity-90">
             {/* 開始日時の表示 */}
             {startDateStr && (
-              <span>開始: {startDateStr}</span>
+              <span className="flex items-center gap-1.5">
+                <span className="opacity-60">開始:</span> {startDateStr}
+              </span>
             )}
-            <span>最高記録: {maxStreak}日</span>
+            <span className="flex items-center gap-1.5">
+              <span className="opacity-60">最高記録:</span> {maxStreak}日
+            </span>
           </div>
 
           {/* リセットボタン */}

@@ -4,12 +4,12 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { dailyRecords, streaks } from "@/schema";
 import { eq, desc } from "drizzle-orm";
-import { ActivityCalendar } from "@/components/calendar/activity-calendar";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { ActivityCalendar } from "@/components/calendar/activity-calendar";
 
-export default async function CalendarPage() {
+export default async function RecordsPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -38,9 +38,10 @@ export default async function CalendarPage() {
               <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </Link>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground">活動カレンダー</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">記録と振り返り</h1>
         </div>
 
+        {/* カレンダーセクション */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-both">
           <ActivityCalendar records={records} startedAt={startedAt} />
         </div>
@@ -48,4 +49,3 @@ export default async function CalendarPage() {
     </main>
   );
 }
-

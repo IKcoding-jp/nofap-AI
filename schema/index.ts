@@ -74,7 +74,7 @@ export const dailyRecords = sqliteTable("daily_records", {
   analysisSummary: text("analysis_summary"),
   analysisCategory: text("analysis_category"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }),
+  // updatedAt はテーブルに存在しないため削除
 });
 
 export const aiChatSessions = sqliteTable("ai_chat_sessions", {
@@ -132,4 +132,16 @@ export const userHabits = sqliteTable("user_habits", {
   streak: integer("streak").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+});
+
+export const dailyMissions = sqliteTable("daily_missions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  missionId: text("mission_id").notNull(),
+  date: text("date").notNull(), // ISO Date string YYYY-MM-DD
+  status: text("status", { enum: ["pending", "completed"] }).notNull().default("pending"),
+  completedAt: integer("completed_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });

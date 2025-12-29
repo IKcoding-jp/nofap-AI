@@ -122,4 +122,8 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* モバイルファーストのコンテナ設定 */
+  .container {
+    @apply w-full px-4 sm:px-6 md:px-8;
+  }
 }

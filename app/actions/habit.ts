@@ -1,12 +1,63 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { userProfiles } from "@/schema";
-import { eq } from "drizzle-orm";
+import { userHabits, userProfiles } from "@/schema";
+import { and, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { calculateLevel, calculateMoteLevel } from "@/lib/gamification";
 import { revalidatePath } from "next/cache";
+
+function toIsoDate(d: Date) {
+  return d.toISOString().split("T")[0];
+}
+
+function isSameIsoDate(a: Date, b: Date) {
+  return toIsoDate(a) === toIsoDate(b);
+}
+
+async function getOrCreateDailyHabitCounter(userId: string, habitName: string) {
+  const existing = await db.query.userHabits.findFirst({
+    where: and(eq(userHabits.userId, userId), eq(userHabits.habitName, habitName)),
+  });
+
+  if (existing) return existing;
+
+  const [created] = await db
+    .insert(userHabits)
+    .values({
+      userId,
+      habitName,
+      // NOTE: 現状は「今日の実行回数」を入れる用途で利用（テーブル未使用のため安全）
+      streak: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning();
+
+  return created;
+}
+
+async function bumpDailyCount(userId: string, habitName: string, cap: number) {
+  const row = await getOrCreateDailyHabitCounter(userId, habitName);
+  const now = new Date();
+
+  const todayCount = row.updatedAt && isSameIsoDate(row.updatedAt, now) ? row.streak : 0;
+  if (todayCount >= cap) {
+    return { capped: true as const, todayCount, cap };
+  }
+
+  const nextCount = todayCount + 1;
+  await db
+    .update(userHabits)
+    .set({
+      streak: nextCount,
+      updatedAt: now,
+    })
+    .where(eq(userHabits.id, row.id));
+
+  return { capped: false as const, todayCount: nextCount, cap };
+}
 
 export async function recordMuscleTraining(count: number) {
   const session = await auth.api.getSession({
@@ -24,7 +75,13 @@ export async function recordMuscleTraining(count: number) {
 
   if (!userProfile) return;
 
-  const xpToAdd = 30; // 筋トレ1回につき30XP
+  // 1日最大3回（それ以上は逓減＝0として扱う）
+  const daily = await bumpDailyCount(userId, "muscle_training", 3);
+  if (daily.capped) {
+    return { xpAdded: 0, vitalityAdded: 0, capped: true as const, cap: daily.cap };
+  }
+
+  const xpToAdd = 30; // 筋トレ1回につき30XP（モチベ重視で固定）
   const ensureNumber = (val: any) => {
     const n = Number(val);
     return isNaN(n) ? 0 : n;
@@ -53,18 +110,24 @@ export async function recordMuscleTraining(count: number) {
     cleanliness: ensureNumber(userProfile.moteCleanliness),
   });
 
+  const currentMax = ensureNumber(userProfile.maxMoteLevel);
+  const nextMax = Math.max(currentMax, newMoteLevel);
+
   await db.update(userProfiles)
     .set({
       totalXp: newTotalXp,
       level: newLevel,
       moteVitality: newVitality,
       moteLevel: newMoteLevel,
+      maxMoteLevel: nextMax,
       updatedAt: new Date(),
     })
     .where(eq(userProfiles.id, userProfile.id));
 
   revalidatePath("/");
   revalidatePath("/tools");
+
+  return { xpAdded: xpToAdd, vitalityAdded: increment, capped: false as const, cap: daily.cap };
 }
 
 export async function recordCleanliness() {
@@ -82,6 +145,12 @@ export async function recordCleanliness() {
   });
 
   if (!userProfile) return;
+
+  // 1日1回（それ以上は逓減＝0として扱う）
+  const daily = await bumpDailyCount(userId, "cleanliness", 1);
+  if (daily.capped) {
+    return { xpAdded: 0, cleanlinessAdded: 0, capped: true as const, cap: daily.cap };
+  }
 
   const xpToAdd = 20; // 清潔感チェックで20XP
   const ensureNumber = (val: any) => {
@@ -112,18 +181,24 @@ export async function recordCleanliness() {
     cleanliness: newCleanliness,
   });
 
+  const currentMax = ensureNumber(userProfile.maxMoteLevel);
+  const nextMax = Math.max(currentMax, newMoteLevel);
+
   await db.update(userProfiles)
     .set({
       totalXp: newTotalXp,
       level: newLevel,
       moteCleanliness: newCleanliness,
       moteLevel: newMoteLevel,
+      maxMoteLevel: nextMax,
       updatedAt: new Date(),
     })
     .where(eq(userProfiles.id, userProfile.id));
 
   revalidatePath("/");
   revalidatePath("/tools");
+
+  return { xpAdded: xpToAdd, cleanlinessAdded: increment, capped: false as const, cap: daily.cap };
 }
 
 

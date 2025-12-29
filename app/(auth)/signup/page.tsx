@@ -43,7 +43,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-background">
+    <div className="flex min-h-screen items-center justify-center p-4 sm:p-6 bg-background">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -51,54 +51,54 @@ export default function SignupPage() {
         className="w-full max-w-md"
       >
         <Card className="border-border bg-card shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold">新規登録</CardTitle>
-            <CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-xl sm:text-2xl font-bold">新規登録</CardTitle>
+            <CardDescription className="text-sm">
               アカウントを作成して、オナ禁の旅を始めましょう。
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSignup}>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
               <div className="space-y-2">
-                <Label htmlFor="name">お名前</Label>
+                <Label htmlFor="name" className="text-sm">お名前</Label>
                 <Input
                   id="name"
                   placeholder="山田 太郎"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="bg-background border-border"
+                  className="bg-background border-border h-10 sm:h-11"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">メールアドレス</Label>
+                <Label htmlFor="email" className="text-sm">メールアドレス</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="user@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-background border-border"
+                  className="bg-background border-border h-10 sm:h-11"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">パスワード</Label>
+                <Label htmlFor="password" className="text-sm">パスワード</Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-background border-border"
+                  className="bg-background border-border h-10 sm:h-11"
                   required
                 />
               </div>
             </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all" disabled={loading}>
+            <CardFooter className="flex flex-col space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0">
+              <Button type="submit" className="w-full h-10 sm:h-11 bg-primary text-primary-foreground hover:bg-primary/90 transition-all text-sm sm:text-base" disabled={loading}>
                 {loading ? "登録中..." : "登録する"}
               </Button>
-              <div className="text-center text-sm text-muted-foreground">
+              <div className="text-center text-xs sm:text-sm text-muted-foreground">
                 既にアカウントをお持ちですか？{" "}
                 <Link href="/login" className="text-primary hover:underline font-medium">
                   ログイン

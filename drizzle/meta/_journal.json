@@ -15,6 +15,13 @@
       "when": 1766804218377,
       "tag": "0001_exotic_albert_cleary",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1767015059483,
+      "tag": "0002_black_spot",
+      "breakpoints": true
     }
   ]
 }

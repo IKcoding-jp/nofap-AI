@@ -88,7 +88,6 @@ export async function resetStreak() {
       .set({
         status: "failure",
         journal: existingRecord.journal, // 既存の日記は保持
-        updatedAt: new Date(),
       })
       .where(eq(dailyRecords.id, existingRecord.id));
   } else {

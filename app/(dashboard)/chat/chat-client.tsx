@@ -207,24 +207,24 @@ export default function ChatClient({ initialSessionId, initialMessages }: { init
   return (
     <main className="flex h-screen flex-col bg-background">
       {/* ヘッダー */}
-      <div className="flex items-center gap-4 bg-card p-4 border-b border-border shadow-sm">
+      <div className="flex items-center gap-2 sm:gap-4 bg-card p-3 sm:p-4 border-b border-border shadow-sm">
         <Link href="/">
-          <Button variant="ghost" size="icon" className="hover:bg-accent transition-colors">
-            <ChevronLeft className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="hover:bg-accent transition-colors shrink-0">
+            <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </Link>
-        <div className="flex items-center gap-2 flex-1">
-          <div className="bg-primary/10 p-2 rounded-lg">
-            <Bot className="h-6 w-6 text-primary" />
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="bg-primary/10 p-1.5 sm:p-2 rounded-lg shrink-0">
+            <Bot className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
           </div>
-          <h1 className="text-xl font-bold text-foreground">AI サポートチャット</h1>
+          <h1 className="text-base sm:text-xl font-bold text-foreground truncate">AI サポートチャット</h1>
         </div>
       </div>
 
       {/* メインコンテンツエリア */}
       <div className="flex flex-1 overflow-hidden">
         {/* サイドバー */}
-        <div className="w-80 shrink-0 border-r border-border">
+        <div className="hidden md:flex w-80 shrink-0 border-r border-border">
           <ChatSidebar
             selectedSessionId={currentSessionId || undefined}
             onSelectSession={handleSelectSession}
@@ -233,11 +233,11 @@ export default function ChatClient({ initialSessionId, initialMessages }: { init
         </div>
 
         {/* チャットエリア */}
-        <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+        <div className="flex-1 flex flex-col overflow-hidden min-h-0 w-full md:w-auto">
 
           <ScrollArea className="flex-1 min-h-0" ref={scrollRef}>
-            <div className="p-4 h-full">
-              <div className="mx-auto max-w-2xl space-y-4 pb-4">
+            <div className="p-3 sm:p-4 h-full">
+              <div className="mx-auto max-w-2xl space-y-3 sm:space-y-4 pb-4">
               <AnimatePresence initial={false}>
                 {(!displayMessages || displayMessages.length === 0) && (
               <motion.div 
@@ -253,7 +253,7 @@ export default function ChatClient({ initialSessionId, initialMessages }: { init
                   <h2 className="text-xl font-semibold text-foreground">何かお手伝いできることはありますか？</h2>
                   <p className="text-muted-foreground">誘惑への対策や、モチベーションの相談など、何でも話してください。</p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   <QuickAction 
                     icon={<AlertTriangle className="h-4 w-4 text-orange-500" />}
                     label="誘惑に負けそう..."
@@ -286,7 +286,7 @@ export default function ChatClient({ initialSessionId, initialMessages }: { init
                       {m.role === "user" ? <User className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
                     </div>
                     <div className={cn(
-                      "max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm relative",
+                      "max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-2 text-xs sm:text-sm shadow-sm relative",
                       m.role === "user" 
                         ? "bg-primary text-primary-foreground rounded-tr-none" 
                         : "bg-card text-foreground border border-border rounded-tl-none"
@@ -337,7 +337,7 @@ export default function ChatClient({ initialSessionId, initialMessages }: { init
           </ScrollArea>
 
           {/* 入力エリア */}
-          <div className="border-t border-border bg-card p-4">
+          <div className="border-t border-border bg-card p-3 sm:p-4">
             <form 
               onSubmit={onFormSubmit}
               className="mx-auto flex max-w-2xl items-center gap-2"
@@ -346,13 +346,13 @@ export default function ChatClient({ initialSessionId, initialMessages }: { init
                 value={input}
                 onChange={handleInputChange}
                 placeholder="メッセージを入力..."
-                className="flex-1 bg-background border-border focus-visible:ring-primary"
+                className="flex-1 bg-background border-border focus-visible:ring-primary h-9 sm:h-10 text-sm"
               />
               <Button 
                 type="submit" 
                 disabled={isLoading || !(input || "").trim()} 
                 size="icon" 
-                className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all active:scale-95"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all active:scale-95 h-9 w-9 sm:h-10 sm:w-10 shrink-0"
               >
                 <Send className="h-4 w-4" />
               </Button>

@@ -67,20 +67,20 @@ export function MeditationTimer() {
 
   return (
     <Card className="border-border bg-card">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>誘惑をやり過ごす</CardTitle>
-            <CardDescription>
+      <CardHeader className="p-4 sm:p-6">
+        <div className="flex flex-col gap-4">
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-lg sm:text-xl">誘惑をやり過ごす</CardTitle>
+            <CardDescription className="text-xs sm:text-sm mt-1">
               深呼吸や瞑想で、脳の興奮を落ち着かせます。
             </CardDescription>
           </div>
-          <div className="flex gap-2 bg-secondary p-1 rounded-lg">
+          <div className="flex gap-2 bg-secondary p-1 rounded-lg w-full sm:w-auto">
             <Button 
               variant={mode === "meditation" ? "default" : "ghost"} 
               size="sm" 
               onClick={() => { setMode("meditation"); setTimeLeft(180); setIsActive(false); }}
-              className="text-xs"
+              className="text-xs sm:text-sm h-9 sm:h-9 flex-1 sm:flex-none px-4"
             >
               瞑想
             </Button>
@@ -88,17 +88,17 @@ export function MeditationTimer() {
               variant={mode === "breathing" ? "default" : "ghost"} 
               size="sm" 
               onClick={() => { setMode("breathing"); setTimeLeft(60); setIsActive(false); }}
-              className="text-xs"
+              className="text-xs sm:text-sm h-9 sm:h-9 flex-1 sm:flex-none px-4"
             >
               深呼吸
             </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-col items-center py-10">
+      <CardContent className="flex flex-col items-center py-4 sm:py-6 md:py-10 px-4 sm:px-6">
         {mode === "meditation" ? (
-          <div className="relative flex items-center justify-center">
-            <svg className="h-64 w-64 -rotate-90">
+          <div className="relative flex items-center justify-center w-full max-w-sm mx-auto">
+            <svg className="h-56 w-56 sm:h-64 sm:w-64 md:h-72 md:w-72 -rotate-90 max-w-full" viewBox="0 0 256 256">
               <circle
                 cx="128"
                 cy="128"
@@ -122,42 +122,42 @@ export function MeditationTimer() {
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-5xl font-black tabular-nums">{formatTime(timeLeft)}</span>
-              <span className="text-sm text-muted-foreground mt-2 font-medium">
+              <span className="text-4xl sm:text-5xl md:text-6xl font-black tabular-nums">{formatTime(timeLeft)}</span>
+              <span className="text-xs sm:text-sm text-muted-foreground mt-2 font-medium text-center px-4">
                 {isActive ? "集中してください" : "準備はいいですか？"}
               </span>
             </div>
           </div>
         ) : (
-          <div className="h-64 flex flex-col items-center justify-center">
+          <div className="h-56 sm:h-64 md:h-72 flex flex-col items-center justify-center w-full max-w-sm mx-auto">
              <motion.div
               animate={{ 
                 scale: breathPhase === "in" ? 1.5 : breathPhase === "hold" ? 1.5 : 1,
                 opacity: breathPhase === "in" ? 0.8 : 0.4
               }}
               transition={{ duration: breathPhase === "out" ? 8 : 4, ease: "easeInOut" }}
-              className="h-32 w-32 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20"
+              className="h-28 w-28 sm:h-32 sm:w-32 md:h-40 md:w-40 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20"
             >
-              <Wind className="h-12 w-12 text-primary-foreground" />
+              <Wind className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 text-primary-foreground" />
             </motion.div>
-            <div className="mt-8 text-center">
-              <span className="text-2xl font-bold uppercase tracking-widest text-primary">
+            <div className="mt-4 sm:mt-6 md:mt-8 text-center px-4">
+              <span className="text-base sm:text-lg md:text-xl font-bold uppercase tracking-wider sm:tracking-widest text-primary block">
                 {isActive ? (
                   breathPhase === "in" ? "吸って..." : 
                   breathPhase === "hold" ? "止めて..." : "吐いて..."
                 ) : "開始ボタンを押してください"}
               </span>
-              <p className="text-sm text-muted-foreground mt-2">残り {formatTime(timeLeft)}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">残り {formatTime(timeLeft)}</p>
             </div>
           </div>
         )}
 
-        <div className="mt-10 flex gap-4">
-          <Button variant="outline" size="icon" onClick={resetTimer} className="h-12 w-12 rounded-full border-border">
-            <RotateCcw className="h-5 w-5" />
+        <div className="mt-6 sm:mt-8 md:mt-10 flex gap-3 sm:gap-4 justify-center w-full max-w-sm mx-auto">
+          <Button variant="outline" size="icon" onClick={resetTimer} className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border-border shrink-0">
+            <RotateCcw className="h-5 w-5 sm:h-6 sm:w-6" />
           </Button>
-          <Button onClick={toggleTimer} size="lg" className="h-12 w-32 rounded-full shadow-md font-bold text-lg">
-            {isActive ? <Pause className="h-6 w-6 mr-2" /> : <Play className="h-6 w-6 mr-2" />}
+          <Button onClick={toggleTimer} size="lg" className="h-11 sm:h-12 flex-1 sm:flex-none sm:w-36 md:w-40 rounded-full shadow-md font-bold text-sm sm:text-base">
+            {isActive ? <Pause className="h-5 w-5 sm:h-6 sm:w-6 mr-2" /> : <Play className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />}
             {isActive ? "一時停止" : "スタート"}
           </Button>
         </div>

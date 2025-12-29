@@ -152,3 +152,4 @@
 - 技術詳細: `docs/streak_timer_technical_details.md`
 - タスク管理: `docs/streak_timer_tasks.md`
 
+

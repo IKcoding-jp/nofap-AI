@@ -159,6 +159,8 @@ export async function saveJournal(journal: string) {
       cleanliness: newCleanliness,
     });
 
+    const newMaxMoteLevel = Math.max(ensureNumber(userProfile.maxMoteLevel), newMoteLevel);
+
     // 値の検証
     if (isNaN(newMoteLevel) || isNaN(newConfidence) || isNaN(newVitality) || isNaN(newCalmness) || isNaN(newCleanliness)) {
       console.error("Invalid mote attribute values:", {
@@ -180,6 +182,7 @@ export async function saveJournal(journal: string) {
         moteCalmness: newCalmness,
         moteCleanliness: newCleanliness,
         moteLevel: newMoteLevel,
+        maxMoteLevel: newMaxMoteLevel,
         updatedAt: new Date(),
       })
       .where(eq(userProfiles.id, userProfile.id));

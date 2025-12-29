@@ -6,10 +6,9 @@ import { streaks, userProfiles } from "@/schema";
 import { eq } from "drizzle-orm";
 import { StreakCounter } from "@/components/dashboard/streak-counter";
 import { StartStreakButton } from "@/components/dashboard/start-streak-button";
-import { MoteMeter } from "@/components/dashboard/mote-meter";
 import { MoteMission } from "@/components/dashboard/mote-mission";
 import { RecordSection } from "@/components/dashboard/record-section";
-import { LevelCard } from "@/components/dashboard/level-card";
+import { UnifiedLevelCard } from "@/components/dashboard/unified-level-card";
 import { UserNav } from "@/components/layout/user-nav";
 import { Button } from "@/components/ui/button";
 import { Hammer } from "lucide-react";
@@ -117,43 +116,41 @@ export default async function DashboardPage() {
   const titles = getTitles(level);
 
   return (
-    <main className="min-h-screen bg-background p-4 md:p-8">
-      <div className="mx-auto max-w-2xl space-y-6">
+    <main className="min-h-screen bg-background p-4 sm:p-6 md:p-8">
+      <div className="mx-auto max-w-2xl space-y-4 sm:space-y-6">
         {/* ヘッダー */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground break-words">
               おかえりなさい、{session.user.name}さん
             </h1>
-            <p className="text-muted-foreground text-sm">今日の調子はいかがですか？</p>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-1">今日の調子はいかがですか？</p>
           </div>
           <UserNav />
         </div>
 
         {/* メイングリッド */}
-        <div className="grid gap-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {userStreak.startedAt ? (
-              <StreakCounter
-                currentStreak={userStreak.currentStreak}
-                maxStreak={userStreak.maxStreak}
-                startedAt={userStreak.startedAt}
-              />
-            ) : (
-              <StartStreakButton />
-            )}
-            <LevelCard 
-              level={level}
-              xp={userProfile.totalXp}
-              nextLevelXp={nextLevelXp}
-              progress={progress}
-              titles={titles}
+        <div className="grid gap-3 sm:gap-4">
+          {/* ストリークカード（上部） */}
+          {userStreak.startedAt ? (
+            <StreakCounter
+              currentStreak={userStreak.currentStreak}
+              maxStreak={userStreak.maxStreak}
+              startedAt={userStreak.startedAt}
             />
-          </div>
-          
-          <MoteMeter 
-            level={userProfile.moteLevel} 
-            attributes={userProfile.moteAttributes} 
+          ) : (
+            <StartStreakButton />
+          )}
+
+          {/* 統合レベルカード（下部） */}
+          <UnifiedLevelCard 
+            level={level}
+            xp={userProfile.totalXp}
+            nextLevelXp={nextLevelXp}
+            progress={progress}
+            titles={titles}
+            moteLevel={userProfile.moteLevel}
+            moteAttributes={userProfile.moteAttributes}
           />
 
           <MoteMission />
@@ -162,33 +159,27 @@ export default async function DashboardPage() {
         </div>
 
         {/* クイックリンク */}
-        <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
-          <Link href="/calendar" className="w-full">
-            <Button variant="outline" className="w-full h-16 flex-col gap-1 border-border bg-card hover:bg-accent transition-colors">
-              <span className="text-xs text-muted-foreground font-normal">過去の記録</span>
-              <span>カレンダー</span>
-            </Button>
-          </Link>
-          <Link href="/journal" className="w-full">
-            <Button variant="outline" className="w-full h-16 flex-col gap-1 border-border bg-card hover:bg-accent transition-colors">
-              <span className="text-xs text-muted-foreground font-normal">振り返り</span>
-              <span>日記一覧</span>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
+          <Link href="/records" className="block w-full">
+            <Button variant="outline" className="w-full h-14 sm:h-16 flex-col gap-1 border-border bg-card hover:bg-accent transition-colors text-sm sm:text-base">
+              <span className="text-xs text-muted-foreground font-normal">記録と振り返り</span>
+              <span className="text-xs sm:text-sm">カレンダー・日記一覧</span>
             </Button>
           </Link>
         </div>
 
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400 fill-mode-both">
           <Link href="/tools" className="block w-full">
-            <Button variant="secondary" className="w-full h-12 gap-2 shadow-sm border border-border">
-              <Hammer className="h-4 w-4" />
-              サポートツール (瞑想・筋トレ)
+            <Button variant="secondary" className="w-full h-11 sm:h-12 gap-2 shadow-sm border border-border text-sm sm:text-base">
+              <Hammer className="h-4 w-4 shrink-0" />
+              <span className="truncate">サポートツール (瞑想・筋トレ)</span>
             </Button>
           </Link>
         </div>
         
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">
           <Link href="/chat" className="block w-full">
-            <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground gap-2 shadow-md">
+            <Button className="w-full h-11 sm:h-12 bg-primary hover:bg-primary/90 text-primary-foreground gap-2 shadow-md text-sm sm:text-base">
               AIに相談する
             </Button>
           </Link>

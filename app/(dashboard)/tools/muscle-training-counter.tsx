@@ -20,9 +20,15 @@ export function MuscleTrainingCounter() {
     if (!selectedCount) return;
     setLoading(true);
     try {
-      await recordMuscleTraining(selectedCount);
+      const res = await recordMuscleTraining(selectedCount);
+      if (res?.capped) {
+        toast.message("今日はもう筋トレを記録済みです", {
+          description: `1日最大${res.cap}回まで`,
+        });
+        return;
+      }
       setCompleted(true);
-      toast.success(`${selectedCount}回の筋トレを記録しました！ (+30 XP)`);
+      toast.success(`${selectedCount}回の筋トレを記録しました！ (+${res?.xpAdded ?? 0} XP)`);
       setTimeout(() => setCompleted(false), 3000);
     } catch (error) {
       toast.error("記録に失敗しました");
@@ -34,25 +40,25 @@ export function MuscleTrainingCounter() {
 
   return (
     <Card className="border-border bg-card">
-      <CardHeader>
-        <CardTitle>筋トレカウンター</CardTitle>
-        <CardDescription>
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-lg sm:text-xl">筋トレカウンター</CardTitle>
+        <CardDescription className="text-xs sm:text-sm">
           エネルギーを運動に変換しましょう。完了すると経験値を獲得できます。
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-8 py-6">
+      <CardContent className="space-y-6 sm:space-y-8 py-4 sm:py-6 px-4 sm:px-6">
         <div className="flex flex-col items-center">
-          <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 border border-primary/20">
-            <Dumbbell className="h-10 w-10 text-primary" />
+          <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl sm:rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 border border-primary/20">
+            <Dumbbell className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
           </div>
           
-          <div className="grid grid-cols-2 gap-3 w-full">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
             {counts.map((c) => (
               <Button
                 key={c}
                 variant={selectedCount === c ? "default" : "outline"}
                 className={cn(
-                  "h-16 text-lg font-bold border-border transition-all",
+                  "h-14 sm:h-16 text-base sm:text-lg font-bold border-border transition-all",
                   selectedCount === c ? "shadow-md scale-105" : "bg-background"
                 )}
                 onClick={() => setSelectedCount(c)}
@@ -77,15 +83,15 @@ export function MuscleTrainingCounter() {
           )}
         </AnimatePresence>
       </CardContent>
-      <CardFooter className="border-t border-border pt-6">
+      <CardFooter className="border-t border-border pt-4 sm:pt-6 p-4 sm:p-6">
         <Button 
-          className="w-full h-12 text-lg font-bold shadow-lg" 
+          className="w-full h-11 sm:h-12 text-sm sm:text-base md:text-lg font-bold shadow-lg" 
           disabled={!selectedCount || loading}
           onClick={handleComplete}
         >
           {loading ? "記録中..." : (
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5" />
+              <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
               トレーニング完了
             </div>
           )}
