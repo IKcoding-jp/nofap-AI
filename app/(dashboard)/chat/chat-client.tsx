@@ -224,7 +224,7 @@ export default function ChatClient({ initialSessionId, initialMessages }: { init
       {/* メインコンテンツエリア */}
       <div className="flex flex-1 overflow-hidden">
         {/* サイドバー */}
-        <div className="hidden md:flex w-80 shrink-0 border-r border-border">
+        <div className="hidden md:flex flex-col w-80 shrink-0 border-r border-border">
           <ChatSidebar
             selectedSessionId={currentSessionId || undefined}
             onSelectSession={handleSelectSession}

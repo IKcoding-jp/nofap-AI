@@ -97,7 +97,7 @@ export default function ChatSidebar({
   };
 
   return (
-    <div className="flex flex-col h-full bg-card">
+    <div className="flex flex-col h-full w-full bg-card">
       {/* 新規チャットボタン */}
       <div className="p-4 border-b border-border">
         <Button
@@ -110,8 +110,8 @@ export default function ChatSidebar({
         </Button>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className="p-2 space-y-1">
+      <ScrollArea className="flex-1 w-full">
+        <div className="p-2 space-y-1 w-full">
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground text-sm">
               読み込み中...
@@ -125,7 +125,7 @@ export default function ChatSidebar({
               <div
                 key={session.id}
                 className={cn(
-                  "group relative rounded-md",
+                  "group relative rounded-md w-full",
                   selectedSessionId === session.id && "bg-accent"
                 )}
               >
@@ -137,18 +137,18 @@ export default function ChatSidebar({
                   )}
                   onClick={() => onSelectSession(session.id)}
                 >
-                  <div className="flex flex-col gap-1 flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
+                  <span className="flex flex-col gap-1 flex-1 min-w-0">
+                    <span className="flex items-center justify-between">
                       <span className="font-medium text-sm truncate">
                         {session.title}
                       </span>
-                    </div>
+                    </span>
                     {session.lastMessageAt && (
                       <span className="text-xs text-muted-foreground">
                         {formatSessionDate(session.lastMessageAt)}
                       </span>
                     )}
-                  </div>
+                  </span>
                 </Button>
                 <Button
                   variant="ghost"
