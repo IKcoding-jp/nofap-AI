@@ -131,9 +131,8 @@ export function InlineChat({ initialSessionId, initialMessages = [] }: InlineCha
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="h-full"
         >
-            <Card className="relative overflow-hidden border border-primary/10 bg-card shadow-xl group transition-all duration-300 hover:shadow-2xl hover:border-primary/20 h-full flex flex-col">
+            <Card className="relative overflow-hidden border border-primary/10 bg-card shadow-xl group transition-all duration-300 hover:shadow-2xl hover:border-primary/20 flex flex-col h-[700px]">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
 
                 <CardHeader className="pb-2 sm:pb-3 relative z-10 p-4 sm:p-5">
@@ -149,7 +148,7 @@ export function InlineChat({ initialSessionId, initialMessages = [] }: InlineCha
                     </div>
                 </CardHeader>
 
-                <CardContent className="relative z-10 p-3 sm:p-4 pt-0 flex-1 flex flex-col min-h-0 gap-2">
+                <CardContent className="relative z-10 p-3 sm:p-4 pt-0 flex flex-col gap-2 flex-1 min-h-0">
                     {messages && messages.length > 0 ? (
                         <ScrollArea className="flex-1 min-h-0 rounded-lg border border-border/50 bg-background/50" ref={scrollRef}>
                             <div className="p-3 space-y-3">

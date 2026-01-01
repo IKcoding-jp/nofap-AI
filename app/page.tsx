@@ -173,9 +173,9 @@ export default async function DashboardPage() {
         </div>
 
         {/* メインコンテンツエリア - 3カラム */}
-        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 items-center">
           {/* 左カラム: 継続チャレンジ */}
-          <div className="h-full min-h-0 overflow-hidden">
+          <div>
             <ContinuityChallengeSection
               initialHabits={habitsData}
               initialProgress={progressData}
@@ -183,7 +183,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* 中央カラム: 上にストリーク、下に振り返り */}
-          <div className="flex flex-col gap-3 sm:gap-4 h-full min-h-0">
+          <div className="flex flex-col gap-3 sm:gap-4">
             {/* 上: ストリーク */}
             <div className="shrink-0">
               {userStreak.startedAt ? (
@@ -204,7 +204,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* 右カラム: AIアシスタント */}
-          <div className="h-full min-h-0">
+          <div>
             <InlineChat
               initialSessionId={chatSessionId}
               initialMessages={chatMessages}

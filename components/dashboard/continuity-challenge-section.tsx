@@ -121,7 +121,7 @@ export function ContinuityChallengeSection({
     };
 
     return (
-        <Card className="h-full p-4 sm:p-5 space-y-4">
+        <Card className="p-4 sm:p-5 space-y-4 h-[700px] flex flex-col">
             {/* ヘッダー */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -202,7 +202,7 @@ export function ContinuityChallengeSection({
 
             {/* 習慣一覧 */}
             {habits.length > 0 && (
-                <div className="flex-1 overflow-y-auto pr-1 space-y-2 max-h-[280px] scrollbar-thin scrollbar-thumb-muted-foreground/20">
+                <div className="flex-1 overflow-y-auto pr-1 space-y-2 min-h-0 scrollbar-thin scrollbar-thumb-muted-foreground/20">
                     {habits.map((habit) => (
                         <div
                             key={habit.id}
