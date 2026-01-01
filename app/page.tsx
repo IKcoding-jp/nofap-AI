@@ -8,13 +8,12 @@ import { StreakCounter } from "@/components/dashboard/streak-counter";
 import { StartStreakButton } from "@/components/dashboard/start-streak-button";
 
 import { RecordSection } from "@/components/dashboard/record-section";
-import { UnifiedLevelCard } from "@/components/dashboard/unified-level-card";
 import { ContinuityChallengeSection } from "@/components/dashboard/continuity-challenge-section";
 import { UserNav } from "@/components/layout/user-nav";
 import { Button } from "@/components/ui/button";
 import { Hammer } from "lucide-react";
 import Link from "next/link";
-import { calculateLevel, calculateConfidence, calculateMoteLevel, getTitles } from "@/lib/gamification";
+import { calculateLevel, calculateConfidence, calculateMoteLevel } from "@/lib/gamification";
 import { getActiveHabits, getHabitProgress } from "@/app/actions/continuity-challenge";
 
 export default async function DashboardPage() {
@@ -114,8 +113,7 @@ export default async function DashboardPage() {
     console.error("Database error:", e);
   }
 
-  const { level, nextLevelXp, progress } = calculateLevel(userProfile.totalXp);
-  const titles = getTitles(level);
+  const { level } = calculateLevel(userProfile.totalXp);
 
   // 継続チャレンジのデータ取得
   const [habitsData, progressData] = await Promise.all([
@@ -149,17 +147,6 @@ export default async function DashboardPage() {
           ) : (
             <StartStreakButton />
           )}
-
-          {/* 統合レベルカード（下部） */}
-          <UnifiedLevelCard
-            level={level}
-            xp={userProfile.totalXp}
-            nextLevelXp={nextLevelXp}
-            progress={progress}
-            titles={titles}
-            moteLevel={userProfile.moteLevel}
-            moteAttributes={userProfile.moteAttributes}
-          />
 
           <RecordSection />
         </div>
