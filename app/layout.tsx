@@ -16,13 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NoFap AI Support",
+  title: "リブート！",
   description: "オナ禁をサポートするAI Webサービス",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "NoFap AI",
+    title: "リブート！",
   },
 };
 
