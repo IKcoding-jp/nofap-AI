@@ -278,33 +278,33 @@ export function ContinuityChallengeSection({
                             </div>
                         </div>
                     ))}
-                </div>
-            )}
 
-            {/* 昨日分の後付け（コンパクト版） */}
-            {habits.some((h) => h.canBackfillYesterday) && (
-                <div className="flex items-center gap-2 p-2 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
-                    <Clock className="h-4 w-4 text-amber-600 shrink-0" />
-                    <span className="text-xs text-amber-700 dark:text-amber-300 flex-1">
-                        昨日の分も記録できます
-                    </span>
-                    <div className="flex gap-1">
-                        {habits
-                            .filter((h) => h.canBackfillYesterday)
-                            .map((habit) => (
-                                <Button
-                                    key={`backfill-${habit.id}`}
-                                    size="sm"
-                                    variant="outline"
-                                    className="h-7 text-xs border-amber-300 hover:bg-amber-100 dark:border-amber-700 dark:hover:bg-amber-800"
-                                    onClick={() => handleCheck(habit.id, true)}
-                                    disabled={isPending}
-                                >
-                                    <Check className="h-3 w-3 mr-1" />
-                                    昨日
-                                </Button>
-                            ))}
-                    </div>
+                    {/* 昨日分の後付け（コンパクト版） */}
+                    {habits.some((h) => h.canBackfillYesterday) && (
+                        <div className="flex items-center gap-2 p-2 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
+                            <Clock className="h-4 w-4 text-amber-600 shrink-0" />
+                            <span className="text-xs text-amber-700 dark:text-amber-300 flex-1">
+                                昨日の分も記録できます
+                            </span>
+                            <div className="flex gap-1">
+                                {habits
+                                    .filter((h) => h.canBackfillYesterday)
+                                    .map((habit) => (
+                                        <Button
+                                            key={`backfill-${habit.id}`}
+                                            size="sm"
+                                            variant="outline"
+                                            className="h-7 text-xs border-amber-300 hover:bg-amber-100 dark:border-amber-700 dark:hover:bg-amber-800"
+                                            onClick={() => handleCheck(habit.id, true)}
+                                            disabled={isPending}
+                                        >
+                                            <Check className="h-3 w-3 mr-1" />
+                                            昨日
+                                        </Button>
+                                    ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
