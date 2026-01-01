@@ -6,7 +6,7 @@ import { streaks, userProfiles } from "@/schema";
 import { eq } from "drizzle-orm";
 import { StreakCounter } from "@/components/dashboard/streak-counter";
 import { StartStreakButton } from "@/components/dashboard/start-streak-button";
-import { MoteMission } from "@/components/dashboard/mote-mission";
+
 import { RecordSection } from "@/components/dashboard/record-section";
 import { UnifiedLevelCard } from "@/components/dashboard/unified-level-card";
 import { UserNav } from "@/components/layout/user-nav";
@@ -153,7 +153,7 @@ export default async function DashboardPage() {
             moteAttributes={userProfile.moteAttributes}
           />
 
-          <MoteMission />
+
 
           <RecordSection />
         </div>
