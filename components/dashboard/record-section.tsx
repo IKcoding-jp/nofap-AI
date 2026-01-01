@@ -35,14 +35,14 @@ export function RecordSection() {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
     >
-      <Card className="relative overflow-hidden border border-white/50 bg-white/70 backdrop-blur-xl text-slate-900 shadow-xl transition-all duration-500">
+      <Card className="h-full relative overflow-hidden border border-white/50 bg-white/70 backdrop-blur-xl text-slate-900 shadow-xl transition-all duration-500">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-emerald-500/5 opacity-50" />
-        
+
         <CardHeader className="pb-2 sm:pb-3 relative z-10 p-4 sm:p-6">
           <CardTitle className="text-[10px] sm:text-xs font-black flex items-center gap-1.5 sm:gap-2 text-blue-500 tracking-widest uppercase">
             <div className="p-1 sm:p-1.5 rounded-lg bg-blue-50 shadow-sm border border-blue-100 shrink-0">
@@ -51,17 +51,17 @@ export function RecordSection() {
             今日の振り返り
           </CardTitle>
         </CardHeader>
-        
-        <CardContent className="space-y-3 sm:space-y-4 relative z-10 p-4 sm:p-6 pt-0">
-          <div className="bg-white/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/80 shadow-inner">
+
+        <CardContent className="flex-1 flex flex-col space-y-3 sm:space-y-4 relative z-10 p-4 sm:p-6 pt-0 overflow-hidden">
+          <div className="flex-1 min-h-[120px] max-h-[220px] overflow-y-auto bg-white/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/80 shadow-inner">
             <Textarea
               placeholder="今日の一言（日記・反省・気づき）"
               value={journal}
               onChange={(e) => setJournal(e.target.value)}
-              className="min-h-[80px] sm:min-h-[100px] text-xs sm:text-sm bg-transparent border-none transition-colors focus-visible:ring-0 resize-none font-medium placeholder:text-slate-400"
+              className="h-full min-h-[120px] text-xs sm:text-sm bg-transparent border-none transition-colors focus-visible:ring-0 resize-none font-medium placeholder:text-slate-400"
             />
           </div>
-          
+
           <motion.div
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}

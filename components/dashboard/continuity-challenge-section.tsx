@@ -121,7 +121,7 @@ export function ContinuityChallengeSection({
     };
 
     return (
-        <Card className="p-4 sm:p-5 space-y-4">
+        <Card className="h-full p-4 sm:p-5 space-y-4">
             {/* ヘッダー */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -202,13 +202,13 @@ export function ContinuityChallengeSection({
 
             {/* 習慣一覧 */}
             {habits.length > 0 && (
-                <div className="space-y-2">
+                <div className="flex-1 overflow-y-auto pr-1 space-y-2 max-h-[280px] scrollbar-thin scrollbar-thumb-muted-foreground/20">
                     {habits.map((habit) => (
                         <div
                             key={habit.id}
                             className={`flex items-center gap-3 p-3 rounded-lg transition-all ${habit.todayChecked
-                                    ? "bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800"
-                                    : "bg-muted/50 border border-transparent"
+                                ? "bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800"
+                                : "bg-muted/50 border border-transparent"
                                 }`}
                         >
                             {/* チェックボタン */}
@@ -216,8 +216,8 @@ export function ContinuityChallengeSection({
                                 variant={habit.todayChecked ? "default" : "outline"}
                                 size="icon"
                                 className={`h-10 w-10 rounded-full shrink-0 transition-all ${habit.todayChecked
-                                        ? "bg-green-500 hover:bg-green-600 text-white"
-                                        : "border-2 border-dashed hover:border-primary hover:bg-primary/5"
+                                    ? "bg-green-500 hover:bg-green-600 text-white"
+                                    : "border-2 border-dashed hover:border-primary hover:bg-primary/5"
                                     }`}
                                 onClick={() =>
                                     habit.todayChecked
@@ -270,8 +270,8 @@ export function ContinuityChallengeSection({
                             <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
                                 <Flame
                                     className={`h-3.5 w-3.5 ${habit.currentStreak > 0
-                                            ? "text-orange-500"
-                                            : "text-muted-foreground"
+                                        ? "text-orange-500"
+                                        : "text-muted-foreground"
                                         }`}
                                 />
                                 <span>{habit.currentStreak}日</span>

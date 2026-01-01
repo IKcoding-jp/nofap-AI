@@ -9,9 +9,10 @@ import { StartStreakButton } from "@/components/dashboard/start-streak-button";
 
 import { RecordSection } from "@/components/dashboard/record-section";
 import { ContinuityChallengeSection } from "@/components/dashboard/continuity-challenge-section";
+import { QuickChatInput } from "@/components/dashboard/quick-chat-input";
 import { UserNav } from "@/components/layout/user-nav";
 import { Button } from "@/components/ui/button";
-import { Hammer } from "lucide-react";
+import { Hammer, Calendar } from "lucide-react";
 import Link from "next/link";
 import { calculateLevel, calculateConfidence, calculateMoteLevel } from "@/lib/gamification";
 import { getActiveHabits, getHabitProgress } from "@/app/actions/continuity-challenge";
@@ -123,67 +124,71 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-background p-4 sm:p-6 md:p-8">
-      <div className="mx-auto max-w-2xl space-y-4 sm:space-y-6">
+      <div className="mx-auto max-w-2xl lg:max-w-7xl space-y-4 sm:space-y-6">
         {/* ヘッダー */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground break-words">
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground break-words tracking-tight">
               おかえりなさい、{session.user.name}さん
             </h1>
             <p className="text-muted-foreground text-xs sm:text-sm mt-1">今日の調子はいかがですか？</p>
           </div>
-          <UserNav />
+
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center bg-muted/50 p-1 rounded-xl border border-border">
+              <Link href="/records">
+                <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-lg text-xs font-semibold hover:bg-background hover:shadow-sm transition-all duration-200">
+                  <Calendar className="h-3.5 w-3.5 text-blue-500" />
+                  <span className="hidden sm:inline">履歴・カレンダー</span>
+                  <span className="sm:hidden">履歴</span>
+                </Button>
+              </Link>
+              <Link href="/tools">
+                <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-lg text-xs font-semibold hover:bg-background hover:shadow-sm transition-all duration-200">
+                  <Hammer className="h-3.5 w-3.5 text-orange-500" />
+                  <span className="hidden sm:inline">サポートツール</span>
+                  <span className="sm:hidden">ツール</span>
+                </Button>
+              </Link>
+            </div>
+            <div className="h-8 w-[1px] bg-border mx-1" />
+            <UserNav />
+          </div>
         </div>
 
-        {/* メイングリッド */}
-        <div className="grid gap-3 sm:gap-4">
-          {/* ストリークカード（上部） */}
-          {userStreak.startedAt ? (
-            <StreakCounter
-              currentStreak={userStreak.currentStreak}
-              maxStreak={userStreak.maxStreak}
-              startedAt={userStreak.startedAt}
+        {/* メインレイアウトグリッド（3カラム） */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          {/* 左カラム: 継続チャレンジ */}
+          <div className="h-full">
+            <ContinuityChallengeSection
+              initialHabits={habitsData}
+              initialProgress={progressData}
             />
-          ) : (
-            <StartStreakButton />
-          )}
+          </div>
 
-          <RecordSection />
+          {/* 中央カラム: ストリーク */}
+          <div className="flex flex-col">
+            {/* ストリークカード */}
+            {userStreak.startedAt ? (
+              <StreakCounter
+                currentStreak={userStreak.currentStreak}
+                maxStreak={userStreak.maxStreak}
+                startedAt={userStreak.startedAt}
+              />
+            ) : (
+              <StartStreakButton />
+            )}
+          </div>
+
+          {/* 右カラム: 今日の振り返り */}
+          <div className="h-full">
+            <RecordSection />
+          </div>
         </div>
 
-        {/* 継続チャレンジセクション（埋め込み） */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-250 fill-mode-both">
-          <ContinuityChallengeSection
-            initialHabits={habitsData}
-            initialProgress={progressData}
-          />
-        </div>
-
-        {/* クイックリンク */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
-          <Link href="/records" className="block w-full">
-            <Button variant="outline" className="w-full h-14 sm:h-16 flex-col gap-1 border-border bg-card hover:bg-accent transition-colors text-sm sm:text-base">
-              <span className="text-xs text-muted-foreground font-normal">記録と振り返り</span>
-              <span className="text-xs sm:text-sm">カレンダー・日記一覧</span>
-            </Button>
-          </Link>
-        </div>
-
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400 fill-mode-both">
-          <Link href="/tools" className="block w-full">
-            <Button variant="secondary" className="w-full h-11 sm:h-12 gap-2 shadow-sm border border-border text-sm sm:text-base">
-              <Hammer className="h-4 w-4 shrink-0" />
-              <span className="truncate">サポートツール (瞑想・筋トレ)</span>
-            </Button>
-          </Link>
-        </div>
-
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">
-          <Link href="/chat" className="block w-full">
-            <Button className="w-full h-11 sm:h-12 bg-primary hover:bg-primary/90 text-primary-foreground gap-2 shadow-md text-sm sm:text-base">
-              AIに相談する
-            </Button>
-          </Link>
+        {/* インラインチャット入力 - 幅を制限して中央寄せ */}
+        <div className="max-w-3xl mx-auto w-full pt-4">
+          <QuickChatInput />
         </div>
       </div>
     </main>
