@@ -9,11 +9,13 @@ import { StartStreakButton } from "@/components/dashboard/start-streak-button";
 
 import { RecordSection } from "@/components/dashboard/record-section";
 import { UnifiedLevelCard } from "@/components/dashboard/unified-level-card";
+import { ContinuityChallengeSection } from "@/components/dashboard/continuity-challenge-section";
 import { UserNav } from "@/components/layout/user-nav";
 import { Button } from "@/components/ui/button";
 import { Hammer } from "lucide-react";
 import Link from "next/link";
 import { calculateLevel, calculateConfidence, calculateMoteLevel, getTitles } from "@/lib/gamification";
+import { getActiveHabits, getHabitProgress } from "@/app/actions/continuity-challenge";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
@@ -28,19 +30,19 @@ export default async function DashboardPage() {
 
   // データの取得
   let userStreak = { currentStreak: 0, maxStreak: 0, startedAt: null as Date | null };
-  let userProfile: { 
-    level: number; 
-    totalXp: number; 
-    moteLevel: number; 
+  let userProfile: {
+    level: number;
+    totalXp: number;
+    moteLevel: number;
     moteAttributes: {
       confidence: number;
       vitality: number;
       calmness: number;
       cleanliness: number;
     };
-  } = { 
-    level: 1, 
-    totalXp: 0, 
+  } = {
+    level: 1,
+    totalXp: 0,
     moteLevel: 0,
     moteAttributes: {
       confidence: 0,
@@ -95,7 +97,7 @@ export default async function DashboardPage() {
         moteLevel: initialMoteLevel,
         updatedAt: new Date(),
       });
-      
+
       userProfile = {
         level: 1,
         totalXp: 0,
@@ -114,6 +116,12 @@ export default async function DashboardPage() {
 
   const { level, nextLevelXp, progress } = calculateLevel(userProfile.totalXp);
   const titles = getTitles(level);
+
+  // 継続チャレンジのデータ取得
+  const [habitsData, progressData] = await Promise.all([
+    getActiveHabits(),
+    getHabitProgress(),
+  ]);
 
   return (
     <main className="min-h-screen bg-background p-4 sm:p-6 md:p-8">
@@ -143,7 +151,7 @@ export default async function DashboardPage() {
           )}
 
           {/* 統合レベルカード（下部） */}
-          <UnifiedLevelCard 
+          <UnifiedLevelCard
             level={level}
             xp={userProfile.totalXp}
             nextLevelXp={nextLevelXp}
@@ -153,9 +161,15 @@ export default async function DashboardPage() {
             moteAttributes={userProfile.moteAttributes}
           />
 
-
-
           <RecordSection />
+        </div>
+
+        {/* 継続チャレンジセクション（埋め込み） */}
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-250 fill-mode-both">
+          <ContinuityChallengeSection
+            initialHabits={habitsData}
+            initialProgress={progressData}
+          />
         </div>
 
         {/* クイックリンク */}
@@ -176,7 +190,7 @@ export default async function DashboardPage() {
             </Button>
           </Link>
         </div>
-        
+
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">
           <Link href="/chat" className="block w-full">
             <Button className="w-full h-11 sm:h-12 bg-primary hover:bg-primary/90 text-primary-foreground gap-2 shadow-md text-sm sm:text-base">
@@ -188,3 +202,4 @@ export default async function DashboardPage() {
     </main>
   );
 }
+

@@ -24,10 +24,8 @@ interface StreakCounterProps {
 }
 
 export function StreakCounter({ currentStreak, maxStreak, startedAt }: StreakCounterProps) {
-  const [elapsed, setElapsed] = useState<ElapsedTime | null>(() => {
-    if (!startedAt) return null;
-    return calculateElapsedTime(startedAt);
-  });
+  // 初期値はnull（サーバー/クライアント間のハイドレーション不一致を防ぐ）
+  const [elapsed, setElapsed] = useState<ElapsedTime | null>(null);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();

@@ -22,6 +22,13 @@
       "when": 1767015059483,
       "tag": "0002_black_spot",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1767243331392,
+      "tag": "0003_tense_shaman",
+      "breakpoints": true
     }
   ]
 }

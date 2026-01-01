@@ -145,3 +145,52 @@ export const dailyMissions = sqliteTable("daily_missions", {
   completedAt: integer("completed_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
+
+// ============================================
+// 継続チャレンジ（習慣チェック）機能用テーブル
+// ============================================
+
+// ユーザーの習慣解放状態を管理
+export const userHabitProgress = sqliteTable("user_habit_progress", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  unlockedSlots: integer("unlocked_slots").notNull().default(1), // 解放済み習慣枠数
+  currentChallengeHabitId: integer("current_challenge_habit_id"), // 現在チャレンジ中の習慣ID
+  updatedAt: integer("updated_at", { mode: "timestamp" }),
+});
+
+// 習慣の定義と進捗状態
+export const habits = sqliteTable("habits", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  status: text("status", {
+    enum: ["challenge", "maintenance", "archived"]
+  }).notNull().default("challenge"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  challengeStartedOn: text("challenge_started_on"), // ISO date: YYYY-MM-DD (JST)
+  challengeCompletedOn: text("challenge_completed_on"), // nullable
+  currentStreak: integer("current_streak").notNull().default(0),
+  longestStreak: integer("longest_streak").notNull().default(0),
+  totalChecks: integer("total_checks").notNull().default(0),
+  archivedAt: integer("archived_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+});
+
+// 日次チェック記録 (UNIQUE: habitId + checkDate)
+export const habitChecks = sqliteTable("habit_checks", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  habitId: integer("habit_id")
+    .notNull()
+    .references(() => habits.id, { onDelete: "cascade" }),
+  checkDate: text("check_date").notNull(), // ISO date: YYYY-MM-DD (JST)
+  checkedAt: integer("checked_at", { mode: "timestamp" }).notNull(),
+  source: text("source", {
+    enum: ["same_day", "backfill_yesterday"]
+  }).notNull().default("same_day"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
