@@ -9,13 +9,14 @@ import { StartStreakButton } from "@/components/dashboard/start-streak-button";
 
 import { RecordSection } from "@/components/dashboard/record-section";
 import { ContinuityChallengeSection } from "@/components/dashboard/continuity-challenge-section";
-import { QuickChatInput } from "@/components/dashboard/quick-chat-input";
+import { InlineChat } from "@/components/dashboard/inline-chat";
 import { UserNav } from "@/components/layout/user-nav";
 import { Button } from "@/components/ui/button";
 import { Hammer, Calendar } from "lucide-react";
 import Link from "next/link";
 import { calculateLevel, calculateConfidence, calculateMoteLevel } from "@/lib/gamification";
 import { getActiveHabits, getHabitProgress } from "@/app/actions/continuity-challenge";
+import { listChatSessions, getChatHistory, createChatSession } from "@/app/actions/chat";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
@@ -122,73 +123,93 @@ export default async function DashboardPage() {
     getHabitProgress(),
   ]);
 
+  // チャットセッション情報を取得
+  let chatSessionId: number | undefined;
+  let chatMessages: any[] = [];
+  try {
+    const sessions = await listChatSessions();
+    if (sessions.length > 0) {
+      chatSessionId = sessions[0].id;
+      chatMessages = await getChatHistory(chatSessionId);
+    } else {
+      chatSessionId = await createChatSession();
+    }
+  } catch (e) {
+    console.error("Failed to load chat session:", e);
+  }
+
   return (
-    <main className="min-h-screen bg-background p-4 sm:p-6 md:p-8">
-      <div className="mx-auto max-w-2xl lg:max-w-7xl space-y-4 sm:space-y-6">
+    <main className="h-screen overflow-hidden bg-background p-3 sm:p-4 md:p-5 flex flex-col">
+      <div className="mx-auto max-w-2xl lg:max-w-7xl w-full flex flex-col h-full gap-3 sm:gap-4">
         {/* ヘッダー */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-border pb-3 shrink-0">
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground break-words tracking-tight">
+            <h1 className="text-lg sm:text-xl font-bold text-foreground break-words tracking-tight">
               おかえりなさい、{session.user.name}さん
             </h1>
-            <p className="text-muted-foreground text-xs sm:text-sm mt-1">今日の調子はいかがですか？</p>
+            <p className="text-muted-foreground text-xs mt-0.5">今日の調子はいかがですか？</p>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className="flex items-center bg-muted/50 p-1 rounded-xl border border-border">
               <Link href="/records">
-                <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-lg text-xs font-semibold hover:bg-background hover:shadow-sm transition-all duration-200">
-                  <Calendar className="h-3.5 w-3.5 text-blue-500" />
+                <Button variant="ghost" size="sm" className="h-7 gap-1.5 rounded-lg text-xs font-semibold hover:bg-background hover:shadow-sm transition-all duration-200">
+                  <Calendar className="h-3 w-3 text-blue-500" />
                   <span className="hidden sm:inline">履歴・カレンダー</span>
                   <span className="sm:hidden">履歴</span>
                 </Button>
               </Link>
               <Link href="/tools">
-                <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-lg text-xs font-semibold hover:bg-background hover:shadow-sm transition-all duration-200">
-                  <Hammer className="h-3.5 w-3.5 text-orange-500" />
+                <Button variant="ghost" size="sm" className="h-7 gap-1.5 rounded-lg text-xs font-semibold hover:bg-background hover:shadow-sm transition-all duration-200">
+                  <Hammer className="h-3 w-3 text-orange-500" />
                   <span className="hidden sm:inline">サポートツール</span>
                   <span className="sm:hidden">ツール</span>
                 </Button>
               </Link>
             </div>
-            <div className="h-8 w-[1px] bg-border mx-1" />
+            <div className="h-6 w-[1px] bg-border mx-0.5" />
             <UserNav />
           </div>
         </div>
 
-        {/* メインレイアウトグリッド（3カラム） */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+        {/* メインコンテンツエリア - 3カラム */}
+        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
           {/* 左カラム: 継続チャレンジ */}
-          <div className="h-full">
+          <div className="h-full min-h-0 overflow-hidden">
             <ContinuityChallengeSection
               initialHabits={habitsData}
               initialProgress={progressData}
             />
           </div>
 
-          {/* 中央カラム: ストリーク */}
-          <div className="flex flex-col">
-            {/* ストリークカード */}
-            {userStreak.startedAt ? (
-              <StreakCounter
-                currentStreak={userStreak.currentStreak}
-                maxStreak={userStreak.maxStreak}
-                startedAt={userStreak.startedAt}
-              />
-            ) : (
-              <StartStreakButton />
-            )}
+          {/* 中央カラム: 上にストリーク、下に振り返り */}
+          <div className="flex flex-col gap-3 sm:gap-4 h-full min-h-0">
+            {/* 上: ストリーク */}
+            <div className="shrink-0">
+              {userStreak.startedAt ? (
+                <StreakCounter
+                  currentStreak={userStreak.currentStreak}
+                  maxStreak={userStreak.maxStreak}
+                  startedAt={userStreak.startedAt}
+                />
+              ) : (
+                <StartStreakButton />
+              )}
+            </div>
+
+            {/* 下: 今日の振り返り */}
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <RecordSection />
+            </div>
           </div>
 
-          {/* 右カラム: 今日の振り返り */}
-          <div className="h-full">
-            <RecordSection />
+          {/* 右カラム: AIアシスタント */}
+          <div className="h-full min-h-0">
+            <InlineChat
+              initialSessionId={chatSessionId}
+              initialMessages={chatMessages}
+            />
           </div>
-        </div>
-
-        {/* インラインチャット入力 - 幅を制限して中央寄せ */}
-        <div className="max-w-3xl mx-auto w-full pt-4">
-          <QuickChatInput />
         </div>
       </div>
     </main>
