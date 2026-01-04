@@ -12,7 +12,7 @@ import { ContinuityChallengeSection } from "@/components/dashboard/continuity-ch
 import { InlineChat } from "@/components/dashboard/inline-chat";
 import { UserNav } from "@/components/layout/user-nav";
 import { Button } from "@/components/ui/button";
-import { Hammer, Calendar } from "lucide-react";
+import { Calendar, Wind } from "lucide-react";
 import Link from "next/link";
 import { calculateLevel, calculateConfidence, calculateMoteLevel } from "@/lib/gamification";
 import { getActiveHabits, getHabitProgress } from "@/app/actions/continuity-challenge";
@@ -159,11 +159,11 @@ export default async function DashboardPage() {
                   <span className="sm:hidden">履歴</span>
                 </Button>
               </Link>
-              <Link href="/tools">
+              <Link href="/breathing">
                 <Button variant="ghost" size="sm" className="h-7 gap-1.5 rounded-lg text-xs font-semibold hover:bg-background hover:shadow-sm transition-all duration-200">
-                  <Hammer className="h-3 w-3 text-orange-500" />
-                  <span className="hidden sm:inline">サポートツール</span>
-                  <span className="sm:hidden">ツール</span>
+                  <Wind className="h-3 w-3 text-cyan-500" />
+                  <span className="hidden sm:inline">呼吸ガイド</span>
+                  <span className="sm:hidden">呼吸</span>
                 </Button>
               </Link>
             </div>
